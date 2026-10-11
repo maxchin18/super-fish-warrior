@@ -96,6 +96,9 @@ button{font:inherit;color:inherit}
   box-shadow:0 3px 10px rgba(47,111,147,.18);font-size:15px;color:var(--ink);white-space:nowrap;transition:opacity .3s,transform .2s;transform:translateY(-14px)}
 .lbl:hover{transform:translateY(-16px) scale(1.04)}
 .lbl.sel{background:var(--deep);color:#fff}
+body.game .lbl{cursor:grab;touch-action:none;transform:translateY(-34px)}
+body.game .lbl:hover{transform:translateY(-36px) scale(1.04)}
+body.game .lbl:active{cursor:grabbing}
 .lbl em{font-style:normal;font-size:12px;color:var(--ink-soft)}
 .lbl.sel em{color:#d6ecf5}
 
@@ -481,6 +484,7 @@ const INFO = {
 const ORDER = ['scales', 'fins', 'skin', 'head', 'gills', 'fillet', 'bladder', 'viscera'];   // 由外而內的拆解順序
 const LIST = ['scales', 'skin', 'fillet', 'skeleton', 'head', 'gills', 'viscera', 'bladder', 'fins'];
 const GAME_HINT = ['viscera', 'bladder', 'gills', 'fillet', 'head', 'skin', 'scales', 'fins'];
+const GAME_SCALE = { bladder: 2.1, gills: 1.1, viscera: 1.1, fins: .7 };   // 組合挑戰時散落零件的大小
 const GAME_INNER = { scales: .55, fins: .3, gills: .5, viscera: .5 };   // 組合挑戰時，零件散開的程度
 const OTHER_PCT = 100 - Object.values(INFO).reduce((s, p) => s + p.pct, 0);
 
@@ -900,7 +904,10 @@ const labelEls = {};
 for (const key of LIST) {
   const p = parts[key], el = document.createElement('button');
   el.className = 'lbl'; el.innerHTML = `<i class="dot" style="background:${INFO[key].color}"></i>${INFO[key].name}<em>${INFO[key].pct}%</em>`;
-  el.addEventListener('pointerdown', e => e.stopPropagation());
+  el.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    if (mode === 'game' && !game?.done && ORDER.includes(key) && !parts[key].placed) { e.preventDefault(); startDrag(parts[key], parts[key].root.position.clone(), e); }
+  });
   el.addEventListener('click', e => { e.stopPropagation(); select(key); });
   const obj = new CSS2DObject(el);
   const parent = p.anchorItem ? p.anchorItem.obj : p.inner;
@@ -932,7 +939,7 @@ function applyPart(p, dt) {
   } else {
     if (!p.dragging) p.disp.lerp(p.dispTarget, k);
     const dist = p.disp.length();
-    p.sclTarget = p.placed ? 1 : lerp(1, .55, clamp(dist / 3.2));
+    p.sclTarget = p.placed ? 1 : lerp(1, GAME_SCALE[p.key] || .55, clamp(dist / 3.2));
     const gi = GAME_INNER[p.key] || 0, tgtIe = p.placed ? 0 : gi * (p.dragging ? clamp(dist / 2.5) : 1);
     setInner(p, p.ie + clamp(tgtIe - p.ie, -dt * 2, dt * 2));
   }
@@ -1129,6 +1136,13 @@ function pick(ev) {
 }
 let down = null, drag = null;
 const dragPlane = new THREE.Plane(), tmpV = V();
+function startDrag(p, point, ev) {
+  controls.enabled = false; down = { x: ev.clientX, y: ev.clientY, t: performance.now() };
+  dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(V()).negate(), point);
+  drag = { p, grab: point.clone().sub(p.disp) }; p.dragging = true; p.rotZTarget = 0;
+  try { stage.setPointerCapture(ev.pointerId); } catch (e) {}
+  select(p.key);
+}
 stage.addEventListener('pointerdown', ev => {
   down = { x: ev.clientX, y: ev.clientY, t: performance.now() };
   if (controls.autoRotate && mode === 'explore' && !userSpin) controls.autoRotate = false;
@@ -1136,10 +1150,7 @@ stage.addEventListener('pointerdown', ev => {
   if (mode === 'game' && !game?.done) {
     const h = pick(ev);
     if (h && ORDER.includes(h.key) && !parts[h.key].placed) {
-      const p = parts[h.key]; controls.enabled = false;
-      dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(V()).negate(), h.point);
-      drag = { p, grab: h.point.clone().sub(p.disp) }; p.dragging = true; p.rotZTarget = 0;
-      stage.setPointerCapture(ev.pointerId); select(h.key);
+      startDrag(parts[h.key], h.point, ev);
     }
   }
 }, true);
