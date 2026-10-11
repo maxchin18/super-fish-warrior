@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>台灣鯛 3D 解剖圖</title>
+<meta name="description" content="超級魚戰士—台灣鯛：可拆解、可組合的台灣鯛全魚利用 3D 解剖圖，認識魚鱗、魚皮、魚肉、魚骨、魚頭、魚鰓、內臟、魚鰾與魚鰭的功能與再利用方式。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2d4b5d; --ink-soft:#56758a; --title:#4a8bb2; --deep:#2f6f93;
+  --sea:#eaf7f9; --paper:#fffdf8; --coral:#ee8a6c; --coral-d:#cf6a4c; --mint:#7fc9b3; --lav:#ad95d6; --sun:#f2c66d;
+  --glass:rgba(255,253,248,.86); --line:rgba(79,139,178,.18);
+  --shadow:0 10px 30px rgba(47,111,147,.14), 0 2px 6px rgba(47,111,147,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Noto Sans TC",system-ui,-apple-system,"Microsoft JhengHei",sans-serif;color:var(--ink);line-height:1.6;
+  background:radial-gradient(1100px 700px at 50% 38%,#f7fdfe 0%,#e2f3f7 48%,#cfe7ee 100%);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+h1,h2,h3,.tabs button,.btn,.lbl,.wk{font-family:"LXGW WenKai TC","Noto Sans TC",serif}
+button{font:inherit;color:inherit}
+#stage{position:fixed;inset:0;touch-action:none}
+#stage canvas{display:block;outline:none}
+#labels{position:fixed;inset:0;pointer-events:none}
+
+/* header */
+.top{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:14px;padding:10px 16px;
+  background:linear-gradient(180deg,rgba(247,253,254,.92),rgba(247,253,254,.55) 70%,rgba(247,253,254,0));pointer-events:none}
+.top>*{pointer-events:auto}
+.back{flex:0 0 auto;text-decoration:none;color:var(--deep);font-size:14px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.75);box-shadow:0 1px 4px rgba(47,111,147,.12)}
+.top h1{margin:0;font-size:clamp(19px,2.3vw,27px);color:var(--title);letter-spacing:.06em;line-height:1.2;white-space:nowrap}
+.top h1 small{display:block;font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-family:"Noto Sans TC",sans-serif;font-weight:400}
+.tabs{margin-left:auto;display:flex;background:rgba(255,255,255,.8);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.tabs button{border:0;background:none;padding:7px 16px;border-radius:999px;font-size:16px;cursor:pointer;color:var(--deep);white-space:nowrap}
+.tabs button.on{background:linear-gradient(135deg,#6db4d4,var(--deep));color:#fff}
+
+/* panels */
+.panel{position:fixed;z-index:9;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);border-radius:20px;box-shadow:var(--shadow)}
+.parts{left:16px;top:78px;width:258px;max-height:calc(100vh - 190px);overflow:auto;padding:14px 14px 12px}
+.parts h2,.info h2{margin:0 0 8px;font-size:19px;color:var(--deep)}
+.plist{list-style:none;margin:0;padding:0}
+.plist li{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:10px;cursor:pointer;font-size:15px}
+.plist li:hover{background:rgba(109,180,212,.12)}
+.plist li.sel{background:rgba(109,180,212,.22)}
+.plist li.off .nm{opacity:.45;text-decoration:line-through}
+.dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.plist .nm{flex:1}
+.plist .pc{color:var(--ink-soft);font-size:12.5px;min-width:34px;text-align:right}
+.plist .seen{width:14px;color:var(--mint);font-size:13px;text-align:center}
+.eye{border:0;background:rgba(255,255,255,.8);border-radius:8px;width:28px;height:24px;cursor:pointer;font-size:12px;color:var(--ink-soft);box-shadow:inset 0 0 0 1px var(--line)}
+.yield{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.yield h3{margin:0 0 6px;font-size:15px;color:var(--deep)}
+.bar{display:flex;height:22px;border-radius:7px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.bar span{display:block;height:100%;cursor:pointer;border-right:2px solid var(--paper)}
+.bar span:last-child{border-right:0}
+.bar span:hover{filter:brightness(1.08)}
+.yield p{margin:6px 0 0;font-size:13px;color:var(--ink-soft)}
+.yield b{color:var(--coral-d)}
+.progress{margin-top:10px;font-size:13.5px;color:var(--ink-soft)}
+.progress .pbar{height:6px;border-radius:9px;background:rgba(79,139,178,.15);margin-top:4px;overflow:hidden}
+.progress .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),#56b39a);transition:width .4s}
+
+.info{right:16px;top:78px;width:330px;max-height:calc(100vh - 190px);overflow:auto;padding:16px 18px}
+.info .tag{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:rgba(238,138,108,.14);color:var(--coral-d);margin-bottom:6px}
+.info h2{display:flex;align-items:center;gap:8px;font-size:24px}
+.info h3{margin:12px 0 4px;font-size:16px;color:var(--deep)}
+.info p{margin:0;font-size:15px}
+.info ul{margin:0;padding-left:1.25em;font-size:15px}
+.info li{margin:2px 0}
+.info .pct{margin-top:6px;font-size:13.5px;color:var(--ink-soft)}
+.info .pct .track{height:8px;border-radius:9px;background:rgba(79,139,178,.13);margin-top:3px;overflow:hidden}
+.info .pct .track i{display:block;height:100%;border-radius:9px}
+.info .lesson{margin-top:12px;padding:8px 10px;border-radius:12px;background:rgba(127,201,179,.16);font-size:14px}
+.info .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.info .close{position:absolute;right:10px;top:8px;border:0;background:none;font-size:22px;cursor:pointer;color:var(--ink-soft);display:none}
+.hello p{color:var(--ink-soft)}
+.hello ol{padding-left:1.2em;font-size:14.5px;color:var(--ink)}
+
+/* dock */
+.dock{position:fixed;z-index:9;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
+  padding:10px 14px;max-width:calc(100vw - 24px)}
+.btn{border:0;cursor:pointer;padding:8px 14px;border-radius:999px;font-size:15.5px;background:#fff;color:var(--deep);box-shadow:inset 0 0 0 1px var(--line),0 1px 3px rgba(47,111,147,.1);white-space:nowrap}
+.btn:hover{background:#f2fafc}
+.btn.pri{background:linear-gradient(135deg,#f3a184,var(--coral));color:#fff;box-shadow:0 3px 10px rgba(207,106,76,.25)}
+.btn.sea{background:linear-gradient(135deg,#6db4d4,var(--deep));color:#fff}
+.btn.on{background:var(--deep);color:#fff}
+.btn.sm{padding:5px 11px;font-size:14px}
+.slider{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-soft)}
+.slider input{width:min(230px,38vw);accent-color:var(--coral)}
+.sep{width:1px;height:26px;background:var(--line)}
+.hint{position:fixed;z-index:8;left:50%;bottom:84px;transform:translateX(-50%);font-size:13px;color:var(--ink-soft);background:rgba(255,255,255,.6);padding:3px 12px;border-radius:999px;white-space:nowrap;transition:opacity .6s}
+
+/* labels */
+.lbl{pointer-events:auto;cursor:pointer;border:0;display:flex;align-items:center;gap:6px;padding:4px 11px 4px 8px;border-radius:999px;background:rgba(255,253,248,.93);
+  box-shadow:0 3px 10px rgba(47,111,147,.18);font-size:15px;color:var(--ink);white-space:nowrap;transition:opacity .3s,transform .2s;transform:translateY(-14px)}
+.lbl:hover{transform:translateY(-16px) scale(1.04)}
+.lbl.sel{background:var(--deep);color:#fff}
+.lbl em{font-style:normal;font-size:12px;color:var(--ink-soft)}
+.lbl.sel em{color:#d6ecf5}
+
+/* game */
+.gamebar{position:fixed;z-index:9;left:50%;top:76px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 14px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px)}
+.gamebar .goal{font-size:15px}
+.gamebar .cnt{font-family:"LXGW WenKai TC",serif;font-size:20px;color:var(--coral-d)}
+.gamebar .tm{font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.toast{position:fixed;z-index:30;left:50%;bottom:96px;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:all .35s;
+  background:rgba(47,111,147,.94);color:#fff;padding:10px 18px;border-radius:16px;font-size:15.5px;max-width:min(560px,calc(100vw - 32px));text-align:center;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(20,50,70,.28)}
+.modal.show{display:flex}
+.modal .card{background:var(--paper);border-radius:24px;padding:26px 28px;max-width:440px;margin:16px;text-align:center;box-shadow:var(--shadow)}
+.modal h2{margin:0 0 6px;color:var(--title);font-size:28px}
+.modal .big{font-family:"LXGW WenKai TC",serif;font-size:22px;color:var(--coral-d);margin:4px 0 10px}
+.modal p{margin:0 0 16px;font-size:15.5px}
+.loading{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#eaf6f9;transition:opacity .6s;font-family:"LXGW WenKai TC",serif;color:var(--deep);font-size:20px}
+.loading i{width:46px;height:46px;border-radius:50%;border:4px solid rgba(47,111,147,.15);border-top-color:var(--coral);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.mtoggle{display:none}
+[hidden]{display:none!important}
+body.game .parts,body.game .info{display:none}
+
+@media (max-width:860px){
+  .top{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .top h1{font-size:18px}
+  .top h1 small{display:none}
+  .back{font-size:13px;padding:5px 10px}
+  .tabs button{padding:6px 11px;font-size:14.5px}
+  .parts{top:auto;bottom:0;left:0;right:0;width:auto;border-radius:20px 20px 0 0;max-height:62vh;transform:translateY(105%);transition:transform .3s;z-index:20}
+  .parts.open{transform:none}
+  .info{top:auto;bottom:0;left:0;right:0;width:auto;border-radius:20px 20px 0 0;max-height:56vh;transform:translateY(105%);transition:transform .3s;z-index:21}
+  .info.open{transform:none}
+  .info .close{display:block}
+  .mtoggle{display:inline-block}
+  .dock{bottom:10px;padding:8px 10px;gap:6px}
+  .dock .wide{display:none}
+  .btn{padding:7px 11px;font-size:14.5px}
+  .slider input{width:min(170px,40vw)}
+  .hint{bottom:auto;top:100px;font-size:12px}
+  .gamebar{top:96px;gap:8px;padding:7px 10px}
+  .gamebar .goal{display:none}
+  .lbl{font-size:13px;padding:3px 9px 3px 7px}
+  .lbl em{display:none}
+}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<div class="loading" id="loading"><i></i>正在把台灣鯛組合起來…</div>
+<div id="stage"></div>
+<div id="labels"></div>
+
+<header class="top">
+  <a class="back" href="../">← 超級魚戰士</a>
+  <h1>台灣鯛 3D 解剖圖<small>全魚利用・可拆解・可組合</small></h1>
+  <div class="tabs" role="tablist">
+    <button class="on" data-mode="explore" role="tab">拆解觀察</button>
+    <button data-mode="game" role="tab">組合挑戰</button>
+  </div>
+</header>
+
+<aside class="panel parts" id="parts">
+  <h2>部位清單</h2>
+  <ul class="plist" id="plist"></ul>
+  <div class="yield">
+    <h3>一條台灣鯛的重量組成（約略）</h3>
+    <div class="bar" id="ybar"></div>
+    <p>魚片只占約 <b>三分之一</b>，其餘約三分之二若丟掉就浪費了——全魚利用，讓每個部位都有用處！</p>
+  </div>
+  <div class="progress"><span id="ptext">已認識 0 / 9 個部位</span><div class="pbar"><i id="pfill"></i></div></div>
+</aside>
+
+<section class="panel info" id="info"></section>
+
+<div class="hint" id="hint">拖曳旋轉・滾輪或雙指縮放・點一下部位看全魚利用</div>
+
+<div class="panel dock" id="dock">
+  <button class="btn mtoggle" id="mParts">部位</button>
+  <button class="btn" id="bAssemble">全部組合</button>
+  <button class="btn wide" id="bPrev" title="裝回一層">◀ 裝回</button>
+  <label class="slider"><span>組合</span><input type="range" id="slider" min="0" max="1000" value="0" aria-label="組合與拆解程度"><span>拆解</span></label>
+  <button class="btn wide" id="bNext" title="拆下一層">拆下 ▶</button>
+  <button class="btn pri" id="bExplode">全部拆解</button>
+  <span class="sep wide"></span>
+  <button class="btn wide" id="bXray" title="外層半透明，看見裡面">透視</button>
+  <button class="btn wide" id="bSpin">自動旋轉</button>
+  <button class="btn" id="bReset" title="重設視角">重設視角</button>
+</div>
+
+<div class="panel gamebar" id="gamebar" hidden>
+  <span class="goal">把部位拖回魚骨上，組合出完整的台灣鯛！</span>
+  <span class="cnt" id="gcnt">0 / 9</span>
+  <span class="tm" id="gtime">00:00</span>
+  <button class="btn sm" id="gHint">提示</button>
+  <button class="btn sm" id="gRestart">重新開始</button>
+  <button class="btn sm sea" id="gExit">回到觀察</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="card">
+  <h2>組合完成！</h2>
+  <div class="big" id="mTime"></div>
+  <p>魚肉只占一條魚的三分之一左右；魚頭、魚骨、魚皮、魚鱗、內臟……每個部位都能再利用。這就是「全魚利用、零浪費」的超級魚戰士精神！</p>
+  <button class="btn pri" id="mAgain">再玩一次</button>
+  <button class="btn" id="mBack">回到觀察</button>
+</div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+/* ================= 小工具 ================= */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const sstep = (e0, e1, x) => { const k = clamp((x - e0) / (e1 - e0)); return k * k * (3 - 2 * k); };
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const mixc = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
+function lin(tab, x) {
+  if (x <= tab[0][0]) return tab[0][1];
+  for (let i = 1; i < tab.length; i++) if (x <= tab[i][0]) {
+    const [x0, y0] = tab[i - 1], [x1, y1] = tab[i]; const k = sstep(0, 1, (x - x0) / (x1 - x0)); return lerp(y0, y1, k);
+  }
+  return tab[tab.length - 1][1];
+}
+function hash(x, y) { let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+const fbm = (x, y) => vnoise(x, y) * .55 + vnoise(x * 2.1 + 7, y * 2.1 + 3) * .3 + vnoise(x * 4.3 + 1, y * 4.3 + 9) * .15;
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+/* ================= 魚體外形（t: 0=尾柄, 1=吻端；身體 x 由 -2 到 +2） ================= */
+function profile(pts) {
+  const c = new THREE.CatmullRomCurve3(pts.map(([t, y]) => V(t, y, 0)), false, 'centripetal');
+  const arr = c.getPoints(800);
+  return t => {
+    t = clamp(t); let lo = 0, hi = arr.length - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (arr[m].x < t) lo = m; else hi = m; }
+    const a = arr[lo], b = arr[hi]; return lerp(a.y, b.y, (t - a.x) / ((b.x - a.x) || 1));
+  };
+}
+const TOP = profile([[0, .17], [.06, .18], [.15, .27], [.3, .55], [.45, .7], [.58, .74], [.7, .7], [.8, .61], [.88, .5], [.94, .37], [.975, .23], [1, .04]]);
+const BOT = profile([[0, -.17], [.06, -.18], [.15, -.26], [.3, -.45], [.45, -.58], [.6, -.62], [.72, -.6], [.82, -.52], [.9, -.42], [.95, -.32], [.98, -.21], [1, -.1]]);
+const WID = profile([[0, .04], [.1, .07], [.3, .18], [.5, .28], [.65, .3], [.8, .28], [.9, .23], [.96, .17], [1, .07]]);
+const X = t => -2 + 4 * t;
+const prof = t => { const yt = TOP(t), yb = BOT(t); return { yc: (yt + yb) / 2, hh: (yt - yb) / 2, hw: WID(t) }; };
+function bodyPt(t, th, s = 1, out = V()) {
+  const p = prof(t), st = Math.sin(th), ct = Math.cos(th);
+  const belly = 1 + .1 * Math.max(0, -st), ridge = 1 - .22 * Math.pow(Math.abs(st), 4);
+  return out.set(X(t), p.yc + p.hh * s * st, p.hw * s * ct * belly * ridge);
+}
+// 鰓蓋後緣：頭與軀幹的分界（隨高度彎曲）
+const tCut = th => { const st = Math.sin(th); return .735 - .03 * Math.exp(-(((st - .05) / .55) ** 2)) + .03 * Math.max(0, -st) ** 2; };
+const spineY = t => { const p = prof(t); return p.yc + .13 * p.hh * sstep(0, .3, t); };
+// 貼圖座標：u = t，v 對應 θ = -π/2 + 2πv（接縫在腹中線）
+const TH = v => -Math.PI / 2 + 2 * Math.PI * v;
+const VofTH = th => (th + Math.PI / 2) / (2 * Math.PI);
+
+/* ================= 網格產生器 ================= */
+function gridGeo(nu, nv, fn, { seam = false, uvFn = null } = {}) {
+  const n = (nu + 1) * (nv + 1), pos = new Float32Array(n * 3), uv = new Float32Array(n * 2), idx = [], p = V();
+  for (let i = 0; i <= nu; i++) for (let j = 0; j <= nv; j++) {
+    const k = i * (nv + 1) + j, u = i / nu, v = j / nv; fn(u, v, p);
+    pos[k * 3] = p.x; pos[k * 3 + 1] = p.y; pos[k * 3 + 2] = p.z;
+    const q = uvFn ? uvFn(u, v) : [u, v]; uv[k * 2] = q[0]; uv[k * 2 + 1] = q[1];
+  }
+  for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+    const a = i * (nv + 1) + j, b = a + nv + 1; idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
+  g.computeVertexNormals();
+  if (seam) { // 接縫兩側法線平均，避免出現一條線
+    const nr = g.attributes.normal;
+    for (let i = 0; i <= nu; i++) {
+      const a = i * (nv + 1), b = a + nv; const x = nr.getX(a) + nr.getX(b), y = nr.getY(a) + nr.getY(b), z = nr.getZ(a) + nr.getZ(b), l = Math.hypot(x, y, z) || 1;
+      nr.setXYZ(a, x / l, y / l, z / l); nr.setXYZ(b, x / l, y / l, z / l);
+    }
+  }
+  return g;
+}
+function fanCap(loop, center) {
+  const pos = [center.x, center.y, center.z]; loop.forEach(p => pos.push(p.x, p.y, p.z));
+  const idx = []; for (let i = 1; i < loop.length; i++) idx.push(0, i, i + 1);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(new Array((loop.length + 1) * 2).fill(.5), 2));
+  g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+function canvasTex(w, h, paint, srgb = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d');
+  paint(ctx, w, h);
+  const t = new THREE.CanvasTexture(c); t.flipY = false; if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8; t.wrapS = THREE.RepeatWrapping; return t;
+}
+function pixels(ctx, w, h, f) {
+  const img = ctx.createImageData(w, h), d = img.data;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const c = f(x / (w - 1), y / (h - 1)), k = (y * w + x) * 4;
+    d[k] = clamp(c[0]) * 255; d[k + 1] = clamp(c[1]) * 255; d[k + 2] = clamp(c[2]) * 255; d[k + 3] = c.length > 3 ? clamp(c[3]) * 255 : 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+/* ================= 程式繪製的擬真貼圖 ================= */
+const C_DOR = [.16, .18, .19], C_FLK = [.46, .49, .5], C_BEL = [.88, .88, .86];
+const BARS = [.15, .23, .31, .39, .47, .55, .63];
+function bodyColor(t, st) {
+  let c = mixc(C_FLK, C_DOR, sstep(.02, .85, st));
+  c = mixc(c, C_BEL, sstep(-.08, -.72, st));
+  let b = 0; for (const p of BARS) b = Math.max(b, Math.exp(-(((t - p) / .017) ** 2)));
+  b *= sstep(-.55, .15, st) * (t < .7 ? 1 : 0);
+  c = c.map(x => x * (1 - .42 * b));
+  if (t > .72) { // 頭部：臉頰帶珍珠光、下巴偏粉
+    const cheek = sstep(.72, .78, t) * sstep(.5, -.1, st) * sstep(-.9, -.3, st);
+    c = mixc(c, [.58, .58, .6], cheek * .55);
+  }
+  const n = fbm(t * 26, st * 9) - .5; c = c.map(x => x * (1 + n * .22));
+  return c;
+}
+function scaleCell(t, v, dt, rows) { // 鱗片排列（皮膚上的鱗囊紋）
+  const cu = t / dt, col = Math.floor(cu), cv = v * rows + (col & 1) * .5;
+  const fu = cu - col, fv = cv - Math.floor(cv);
+  const d = Math.hypot((fu - .78) * 1.0, (fv - .5) * .95);
+  return Math.exp(-(((d - .6) / .07) ** 2));
+}
+function makeBodyTextures() {
+  const W = 1024, H = 512;
+  const map = canvasTex(W, H, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    const th = TH(v), st = Math.sin(th), tc = tCut(th);
+    let c = bodyColor(u, st);
+    if (u < tc) { const r = scaleCell(u, v, .0185, 40); c = c.map(x => x * (1 - .22 * r)); }
+    else {
+      const r = scaleCell(u, v, .011, 64) * sstep(.6, -.2, st) * sstep(.86, .8, u); c = c.map(x => x * (1 - .1 * r));
+      const edge = Math.exp(-(((u - tc - .006) / .0035) ** 2)); c = c.map(x => x * (1 - .55 * edge));             // 鰓蓋後緣
+      const pre = Math.exp(-(((u - tc - .055) / .003) ** 2)) * sstep(-.75, -.4, st) * sstep(.55, .3, st); c = c.map(x => x * (1 - .25 * pre)); // 前鰓蓋線
+      const spot = Math.exp(-(((u - tc - .02) / .012) ** 2) - (((st - .32) / .1) ** 2)); c = mixc(c, [.08, .08, .09], spot * .8); // 鰓蓋黑斑
+      const lip = sstep(.975, .995, u); c = mixc(c, [.3, .28, .28], lip * .7);
+    }
+    return c;
+  }));
+  const bump = canvasTex(W, H, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    const th = TH(v), tc = tCut(th);
+    let b = u < tc ? .5 + .5 * scaleCell(u, v, .0185, 40) : .5 + .25 * scaleCell(u, v, .011, 64);
+    if (u >= tc) b -= .45 * Math.exp(-(((u - tc - .006) / .004) ** 2));
+    b += (vnoise(u * 300, v * 160) - .5) * .12;
+    return [b, b, b];
+  }), false);
+  return { map, bump };
+}
+function makeMuscleTex() {
+  return canvasTex(1024, 512, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    const st = Math.sin(TH(v)), a = Math.abs(st - .06);
+    let c = mixc([.93, .74, .68], [.97, .85, .8], fbm(u * 30, st * 6));
+    c = mixc(c, [.96, .9, .86], sstep(-.35, -.8, st));               // 腹部薄肉偏白
+    c = mixc(c, [.88, .62, .57], sstep(.4, .9, st) * .5);
+    const red = Math.exp(-(((st - .06) / .06) ** 2)) * sstep(.04, .14, u) * sstep(.74, .6, u);
+    c = mixc(c, [.55, .2, .2], red * .82);                              // 血合肉（暗紅色肉）
+    const m = u * 42 + 1.7 * a - 1.0 * Math.abs(a - .5);               // 肌節 W 形紋
+    const f = m - Math.floor(m), line = Math.exp(-(((f - .5) / .06) ** 2));
+    c = mixc(c, [1, .96, .94], line * .55);
+    return c;
+  }));
+}
+function makeScaleTex() {
+  return canvasTex(128, 128, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    const x = u * 2 - 1, y = v * 2 - 1, r = Math.hypot(x, y);
+    let b = .93 + .07 * Math.cos(r * 70) * sstep(.2, .5, r);           // 年輪般的鱗紋
+    const ang = Math.atan2(y, x + .4); b -= .05 * Math.pow(Math.abs(Math.sin(ang * 9)), 8) * sstep(.3, .8, r) * sstep(.2, -.4, x);
+    const exposed = sstep(.15, -.35, x) * sstep(.25, .8, r);             // 外露的後緣有色素
+    b *= 1 - .26 * exposed;
+    b *= 1 - .25 * sstep(.88, 1, r);
+    return [b, b, b * 1.01];
+  }));
+}
+function makeFinTex({ rays = 20, base = [.33, .37, .37], tip = [.42, .45, .45], a0 = .9, a1 = .55, stripes = 0, spots = 0, margin = [.62, .28, .22], notchUntil = -1, seedOff = 0 }) {
+  return canvasTex(512, 256, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    let c = mixc(base, tip, v), a = lerp(a0, a1, v);
+    const rr = u * (rays - 1), dr = Math.abs(rr - Math.round(rr)), ray = Math.exp(-((dr / .13) ** 2));
+    c = c.map(x => x * (1 - .2 * ray)); a = Math.min(1, a + .25 * ray);
+    if (stripes) { const s = .5 + .5 * Math.cos(v * stripes * Math.PI * 2 + u * 3); c = c.map(x => x * (1 - .45 * sstep(.55, .85, s))); }
+    if (spots) { const n = fbm(u * spots + seedOff, v * spots * .35); c = mixc(c, [.52, .54, .5], sstep(.62, .76, n) * .3); }
+    c = mixc(c, margin, sstep(.8, 1, v) * .75);
+    if (u <= notchUntil) { const edge = 1 - .16 * (1 - ray) ** 2; if (v > edge) a = 0; }
+    a *= sstep(1, .97, v);
+    return [...c, a];
+  }));
+}
+function makeEyeTex() {
+  return canvasTex(256, 128, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    v = 1 - v;
+    if (v < .14) return [.02, .02, .03];
+    if (v < .34) {
+      const k = (v - .14) / .2, streak = .85 + .15 * Math.sin(u * 220 + vnoise(u * 40, 3) * 6);
+      let c = mixc([.95, .72, .25], [.72, .5, .14], k).map(x => x * streak);
+      return mixc(c, [.1, .08, .05], sstep(.75, 1, k));
+    }
+    return [.2, .2, .22];
+  }));
+}
+function makeGillTex() {
+  return canvasTex(512, 64, (ctx, w, h) => pixels(ctx, w, h, (u, v) => {
+    const f = Math.abs(Math.sin(u * Math.PI * 140)), fil = sstep(.25, .8, f);
+    const len = .75 + .25 * vnoise(u * 300, 1);
+    const a = v < len ? fil : 0;
+    return [.72 - .1 * v, .14, .16, a];
+  }));
+}
+
+/* ================= 場景 ================= */
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer({ element: document.getElementById('labels') });
+labelRenderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), .04).texture;
+const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, .05, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 2.5; controls.maxDistance = 40;
+controls.autoRotateSpeed = .8;
+
+scene.add(new THREE.HemisphereLight(0xe6f6ff, 0xb9a48a, .7));
+const key = new THREE.DirectionalLight(0xfff4e6, 2.3); key.position.set(4, 8, 6); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: .5, far: 30 }); key.shadow.bias = -.0004; key.shadow.normalBias = .02;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xbfe3ff, 1.3); rim.position.set(-6, 3, -6); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, .5); fill.position.set(-3, -2, 5); scene.add(fill);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: .13 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -3.2; ground.receiveShadow = true; scene.add(ground);
+
+/* ================= 部位資料（全魚利用） ================= */
+const INFO = {
+  scales: { name: '魚鱗', color: '#8fc3d6', pct: 4, job: '一片片像屋瓦般重疊的「盔甲」，保護身體、減少游泳時水的阻力。看鱗片上的環紋，還能推算魚的年齡喔！',
+    use: ['萃取膠原蛋白胜肽，做成保養品、保健食品', '熬煮後冷卻，做成 Q 彈的「魚鱗凍」', '研究做成生醫材料', '洗淨晒乾，做成魚鱗貼畫等手作'], lesson: '第3節「全魚利用寶藏圖」：魚鱗 → 萃取膠原蛋白' },
+  fins: { name: '魚鰭與魚尾', color: '#b49ad8', pct: 4, job: '背鰭、臀鰭幫忙保持平衡；胸鰭、腹鰭負責轉彎和煞車；尾鰭是推進器。台灣鯛的尾鰭有一條條直條紋。',
+    use: ['酥炸魚鰭、魚尾，香脆可口', '和魚骨一起熬高湯', '不能吃的部分送去做堆肥'], lesson: '第2節料理時，魚鰭有硬棘，處理要小心！' },
+  skin: { name: '魚皮', color: '#6f8f8a', pct: 6, job: '包住全身的外衣，表面的黏液能擋住細菌、讓魚在水裡游得更滑順。',
+    use: ['炸成香脆的「魚皮酥」零食', '鞣製成魚皮皮革，做鑰匙圈、皮件', '提煉明膠、膠原蛋白', '醫療研究：吳郭魚皮曾被試用為燒燙傷敷料'], lesson: '延伸課程「台灣鯛皮革趣」：魚的盔甲變成我的寶物' },
+  head: { name: '魚頭', color: '#ee8a6c', pct: 15, job: '有大腦、眼睛、鼻孔和嘴巴，負責看、聞和吃東西。台灣鯛的嘴唇厚，愛吃藻類和浮游生物。',
+    use: ['煮成魚頭湯、味噌魚頭湯、砂鍋魚頭', '魚頭膠質多，熬湯滋味濃郁', '熬湯後的殘渣送進廚餘機做堆肥'], lesson: '第3節「全魚利用寶藏圖」：魚頭魚骨 → 熬高湯' },
+  gills: { name: '魚鰓', color: '#d9534f', pct: 3, job: '魚的「肺」：水從嘴巴流進來，經過鮮紅的鰓絲，把水中的氧氣吸進血液。鰓越鮮紅，代表魚越新鮮！',
+    use: ['鰓容易腥、容易腐壞，料理前要清除', '和內臟一起發酵，做成有機液肥、堆肥'], lesson: '挑魚小撇步：看魚鰓是否鮮紅、眼睛是否明亮' },
+  fillet: { name: '魚肉（魚片）', color: '#f2b8a6', pct: 33, job: '一節節「肌節」組成的肌肉，左右擺動推動身體前進。側線旁暗紅色的是「血合肉」，含較多鐵質。',
+    use: ['去刺魚片：外銷、煎魚排、生魚片', '炒成香酥魚鬆、做魚鬆御飯糰', '碎肉打成魚漿、魚丸、鯛魚燒內餡'], lesson: '第3節「魚鬆職人」：用台灣鯛魚肉炒魚鬆' },
+  viscera: { name: '內臟', color: '#a35a4a', pct: 10, job: '包含心臟、肝臟、膽囊、胃和長長的腸子。台灣鯛愛吃藻類，腸子可以長到體長的好幾倍！',
+    use: ['放入廚餘機發酵 → 堆肥 → 學校農園種菜', '水解成液態有機肥', '提煉魚油，或加工成飼料'], lesson: '第3節「全魚利用寶藏圖」：內臟 → 堆肥 → 自給農園' },
+  bladder: { name: '魚鰾', color: '#c9d3d8', pct: 1, job: '裝著氣體的「浮力袋」，調整裡面的氣體多寡，魚就能在水中上浮或下沉。',
+    use: ['洗淨後煮湯，就是富含膠質的「魚肚」', '大型魚的魚鰾還能乾燥成「花膠」'], lesson: '想一想：潛水艇和魚鰾有什麼相同的地方？' },
+  skeleton: { name: '魚骨（中骨）', color: '#e3d3a8', pct: 15, job: '脊椎骨串起全身；背上的髓棘、腹部的肋骨保護內臟、撐起身形，是魚的「鋼骨結構」。',
+    use: ['熬煮魚骨高湯，煮味噌湯或粥', '酥炸成「魚骨酥」，連骨頭一起吃補鈣', '烘乾磨成魚骨鈣粉、飼料'], lesson: '第3節「全魚利用寶藏圖」：魚頭魚骨 → 熬高湯' },
+};
+const ORDER = ['scales', 'fins', 'skin', 'head', 'gills', 'fillet', 'bladder', 'viscera'];   // 由外而內的拆解順序
+const LIST = ['scales', 'skin', 'fillet', 'skeleton', 'head', 'gills', 'viscera', 'bladder', 'fins'];
+const GAME_HINT = ['viscera', 'bladder', 'gills', 'fillet', 'head', 'skin', 'scales', 'fins'];
+const GAME_INNER = { scales: .55, fins: .3, gills: .5, viscera: .5 };   // 組合挑戰時，零件散開的程度
+const OTHER_PCT = 100 - Object.values(INFO).reduce((s, p) => s + p.pct, 0);
+
+/* ================= 建立部位 ================= */
+const parts = {};      // key -> { root, inner, items[], center, offset, e, target, ... }
+const pickables = [];
+function makePart(key, offset, center) {
+  const root = new THREE.Group(), inner = new THREE.Group();
+  root.add(inner); scene.add(root);
+  const p = { key, root, inner, items: [], mats: [], center: center.clone(), offset, e: 0, target: 0, ie: 0, visible: true,
+    disp: V(), dispTarget: V(), scl: 1, sclTarget: 1, rotZ: 0, rotZTarget: 0, placed: true, scatter: null, onInner: null };
+  root.position.copy(center); inner.position.copy(center).negate();
+  parts[key] = p; return p;
+}
+function addMesh(p, mesh, off = null, rot = null, parent = null) {
+  mesh.castShadow = true; mesh.receiveShadow = true; mesh.userData.part = p.key;
+  const holder = new THREE.Group(); holder.add(mesh); (parent || p.inner).add(holder);
+  if (off || rot) {
+    // 讓子物件繞自己的中心旋轉
+    const box = new THREE.Box3().setFromObject(mesh), c = box.getCenter(V());
+    mesh.position.sub(c); holder.position.copy(c);
+    p.items.push({ obj: holder, home: c.clone(), off: off || V(), rot: rot || V() });
+  }
+  pickables.push(mesh);
+  const ms = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  ms.forEach(m => { if (!p.mats.includes(m)) p.mats.push(m); });
+  return mesh;
+}
+const tex = makeBodyTextures(), muscleTex = makeMuscleTex();
+
+// ---------- 魚皮 ----------
+{
+  const p = makePart('skin', V(0, 1.75, -1.7), V(-.3, .05, 0));
+  const g = gridGeo(110, 96, (u, v, o) => { const th = TH(v); bodyPt(lerp(.004, tCut(th) - .002, u), th, .993, o); },
+    { seam: true, uvFn: (u, v) => [lerp(.004, tCut(TH(v)) - .002, u), v] });
+  const m = new THREE.MeshPhysicalMaterial({ map: tex.map, bumpMap: tex.bump, bumpScale: 2, roughness: .42, metalness: .15, clearcoat: .6, clearcoatRoughness: .35, side: THREE.DoubleSide, sheen: .4, sheenColor: new THREE.Color(0x9fb7c0) });
+  addMesh(p, new THREE.Mesh(g, m));
+}
+// ---------- 魚頭（含眼睛、嘴唇） ----------
+{
+  const p = makePart('head', V(1.85, .15, .2), V(1.4, .05, 0));
+  const g = gridGeo(70, 96, (u, v, o) => { const th = TH(v), tc = tCut(th); bodyPt(lerp(tc - .014, 1, Math.pow(u, .9)), th, 1.004 + .006 * (1 - u), o); },
+    { seam: true, uvFn: (u, v) => { const tc = tCut(TH(v)); return [lerp(tc - .014, 1, Math.pow(u, .9)), v]; } });
+  const m = new THREE.MeshPhysicalMaterial({ map: tex.map, bumpMap: tex.bump, bumpScale: 1.5, color: 0xc9cccc, roughness: .4, metalness: .3, clearcoat: .55, clearcoatRoughness: .3, side: THREE.DoubleSide, iridescence: .2, iridescenceIOR: 1.3 });
+  addMesh(p, new THREE.Mesh(g, m));
+  // 頸部切面
+  const loop = []; for (let j = 0; j <= 64; j++) { const th = TH(j / 64); loop.push(bodyPt(tCut(th) - .004, th, .995)); }
+  const cap = new THREE.Mesh(fanCap(loop, V(X(.722), prof(.722).yc, 0)), new THREE.MeshStandardMaterial({ color: 0xe0a597, roughness: .55, side: THREE.DoubleSide }));
+  addMesh(p, cap);
+  // 眼睛
+  const eyeMat = new THREE.MeshPhysicalMaterial({ map: makeEyeTex(), roughness: .08, clearcoat: 1, clearcoatRoughness: .02, metalness: 0 });
+  for (const sg of [1, -1]) {
+    const t = .9, pr = prof(t), st = .36, th = Math.asin(st);
+    const c = bodyPt(t, sg > 0 ? th : Math.PI - th, 1);
+    const nrm = V(.25, .2, sg).normalize();
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(.098, 40, 24), eyeMat);
+    eye.position.copy(c).addScaledVector(nrm, -.042);
+    eye.quaternion.setFromUnitVectors(V(0, 1, 0), nrm);
+    addMesh(p, eye);
+  }
+  // 厚嘴唇與口腔
+  const lipM = new THREE.MeshPhysicalMaterial({ color: 0x6a6462, roughness: .45, clearcoat: .5 });
+  const lip = new THREE.Mesh(new THREE.TorusGeometry(.08, .034, 14, 40), lipM);
+  lip.rotation.y = Math.PI / 2; lip.scale.set(.6, 1, 1.05); lip.position.set(1.995, -.03, 0); addMesh(p, lip);
+  const mouth = new THREE.Mesh(new THREE.CircleGeometry(.06, 24), new THREE.MeshStandardMaterial({ color: 0x2a1c1c, roughness: .8 }));
+  mouth.rotation.y = Math.PI / 2; mouth.scale.set(.5, 1, 1); mouth.position.set(2.0, -.03, 0); addMesh(p, mouth);
+  for (const sg of [1, -1]) { // 鼻孔
+    const n = new THREE.Mesh(new THREE.SphereGeometry(.014, 10, 8), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: .6 }));
+    n.position.copy(bodyPt(.955, sg > 0 ? .55 : Math.PI - .55, 1)); addMesh(p, n);
+  }
+}
+// ---------- 魚肉（左右兩片） ----------
+{
+  const p = makePart('fillet', V(0, 0, 0), V(-.3, .05, 0));
+  const m = new THREE.MeshPhysicalMaterial({ map: muscleTex, roughness: .48, clearcoat: .55, clearcoatRoughness: .3, side: THREE.DoubleSide, sheen: .3, sheenColor: new THREE.Color(0xffe0d6) });
+  const s = .975, t0 = .012;
+  for (const side of [1, -1]) {
+    const thA = side > 0 ? -Math.PI / 2 : Math.PI / 2;           // 右片 θ∈[-90°,90°]，左片 θ∈[90°,270°]
+    const thOf = v => thA + Math.PI * v;
+    const tEnd = th => tCut(th) - .008;
+    const outer = gridGeo(100, 48, (u, v, o) => { const th = thOf(v); bodyPt(lerp(t0, tEnd(th), u), th, s, o); },
+      { uvFn: (u, v) => { const th = thOf(v); return [lerp(t0, tEnd(th), u), VofTH(th)]; } });
+    const wOf = v => side > 0 ? 1 - 2 * v : -1 + 2 * v;           // 內切面
+    const thW = w => side > 0 ? Math.asin(w) : Math.PI - Math.asin(w);
+    const innerG = gridGeo(100, 40, (u, v, o) => {
+      const w = wOf(v), th = thW(w), t = lerp(t0, tEnd(th), u), pr = prof(t); o.set(X(t), pr.yc + pr.hh * s * w, 0);
+    }, { uvFn: (u, v) => { const th = thW(wOf(v)); return [lerp(t0, tEnd(th), u), VofTH(th)]; } });
+    const loopF = [], loopB = [];
+    for (let j = 0; j <= 40; j++) { const th = thOf(j / 40); loopF.push(bodyPt(tEnd(th), th, s)); loopB.push(bodyPt(t0, th, s)); }
+    const capF = fanCap(loopF, V(X(.72) - .02, prof(.72).yc, .12 * side)), capB = fanCap(loopB, V(X(t0), prof(t0).yc, .01 * side));
+    const geo = mergeGeometries([outer, innerG, capF, capB].map(g => { g.deleteAttribute('normal'); return g; }));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, m);
+    addMesh(p, mesh, side > 0 ? V(0, -2.6, 1.6) : V(0, .1, -2.3), side > 0 ? V(Math.PI, 0, 0) : V(0, 0, 0));
+    if (side > 0) p.anchorItem = p.items[p.items.length - 1];
+  }
+}
+// ---------- 魚骨 ----------
+{
+  const p = makePart('skeleton', V(0, 0, 0), V(-.3, .1, 0));
+  const parts_ = [], up = V(0, 1, 0);
+  const cyl = (a, b, r0, r1, seg = 6) => {
+    const d = V().subVectors(b, a), L = d.length(), g = new THREE.CylinderGeometry(r1, r0, L, seg, 1);
+    const q = new THREE.Quaternion().setFromUnitVectors(up, d.clone().normalize());
+    g.applyMatrix4(new THREE.Matrix4().compose(a.clone().addScaledVector(d, .5), q, V(1, 1, 1))); return g;
+  };
+  const N = 29, ta = .03, tb = .705;
+  for (let k = 0; k < N; k++) {
+    const t = lerp(ta, tb, k / (N - 1)), dt = (tb - ta) / (N - 1), pr = prof(t);
+    const c = V(X(t), spineY(t), 0), c2 = V(X(t + .002), spineY(t + .002), 0), dir = c2.clone().sub(c).normalize();
+    const r = .026 + .032 * clamp(pr.hh / .68);
+    const len = dt * 4 * .86;
+    const pts = []; for (let i = 0; i <= 8; i++) { const y = -len / 2 + len * i / 8; pts.push(new THREE.Vector2(r * (.72 + .28 * Math.pow(Math.abs(y) / (len / 2), 2)), y)); }
+    const g = new THREE.LatheGeometry(pts, 14);
+    g.applyMatrix4(new THREE.Matrix4().compose(c, new THREE.Quaternion().setFromUnitVectors(up, dir), V(1, 1, 1)));
+    parts_.push(g);
+    // 髓棘（往上）
+    const yTopIn = pr.yc + pr.hh * .9, tN = t - .03, topEnd = V(X(tN), lerp(spineY(t), prof(tN).yc + prof(tN).hh * .88, .97), 0);
+    parts_.push(cyl(V(c.x, c.y + r * .8, 0), topEnd, .011, .003));
+    if (t < .43) { // 脈棘（往下）
+      const bEnd = V(X(t - .03), lerp(spineY(t), prof(t - .03).yc - prof(t - .03).hh * .86, .97), 0);
+      parts_.push(cyl(V(c.x, c.y - r * .8, 0), bEnd, .011, .003));
+    } else if (t < .69) { // 肋骨（左右彎曲包住腹腔）
+      for (const sg of [1, -1]) {
+        const th0 = Math.asin(clamp((spineY(t) - pr.yc) / (pr.hh * .84), -1, 1)), th1 = -1.05, pts3 = [];
+        for (let i = 0; i <= 10; i++) { const th = lerp(th0, th1, i / 10), q = bodyPt(t - .03 * i / 10, th, .84); q.z *= sg; if (i === 0) q.z = .03 * sg; pts3.push(q); }
+        parts_.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts3), 18, .0075, 5));
+      }
+    }
+  }
+  // 支鰭骨（背鰭、臀鰭的骨頭）
+  for (let i = 0; i < 28; i++) { const t = lerp(.715, .26, i / 27), pr = prof(t); parts_.push(cyl(V(X(t), TOP(t) - .03, 0), V(X(t - .01), lerp(spineY(t), TOP(t), .62), 0), .004, .008, 5)); }
+  for (let i = 0; i < 12; i++) { const t = lerp(.41, .24, i / 11); parts_.push(cyl(V(X(t), BOT(t) + .03, 0), V(X(t - .01), lerp(spineY(t), BOT(t), .6), 0), .004, .008, 5)); }
+  // 尾部尾骨
+  parts_.push(cyl(V(X(.03), spineY(.03), 0), V(-1.95, .12, 0), .012, .006)); parts_.push(cyl(V(X(.03), spineY(.03), 0), V(-1.95, -.12, 0), .012, .006));
+  const g = mergeGeometries(parts_.map(g => { g.deleteAttribute('uv'); return g.index ? g : g; }));
+  const m = new THREE.MeshPhysicalMaterial({ color: 0xd8c08e, roughness: .42, clearcoat: .4, sheen: .3 });
+  addMesh(p, new THREE.Mesh(g, m));
+}
+// ---------- 魚鰾 ----------
+{
+  const p = makePart('bladder', V(-.25, -.8, 1.05), V(.15, .03, 0));
+  const g = new THREE.SphereGeometry(1, 48, 24); const pa = g.attributes.position;
+  for (let i = 0; i < pa.count; i++) {
+    const x = pa.getX(i), taper = x < 0 ? 1 + .55 * x : 1 - .15 * x * x;
+    pa.setXYZ(i, x * .52, pa.getY(i) * .075 * taper, pa.getZ(i) * .105 * taper);
+  }
+  g.computeVertexNormals(); g.translate(.15, spineY(.53) - .12, 0);
+  const m = new THREE.MeshPhysicalMaterial({ color: 0xeef3f4, roughness: .22, metalness: .1, clearcoat: 1, clearcoatRoughness: .1, sheen: 1, sheenColor: new THREE.Color(0xdfeaff), transmission: .15, thickness: .1 });
+  addMesh(p, new THREE.Mesh(g, m));
+}
+// ---------- 內臟 ----------
+{
+  const p = makePart('viscera', V(.3, -1.5, .55), V(.35, -.3, 0));
+  const wet = (c, r = .32) => new THREE.MeshPhysicalMaterial({ color: c, roughness: r, clearcoat: 1, clearcoatRoughness: .18 });
+  const blob = (r, sx, sy, sz, amp, sd) => {
+    const g = new THREE.SphereGeometry(r, 40, 24), pa = g.attributes.position, q = V();
+    for (let i = 0; i < pa.count; i++) { q.fromBufferAttribute(pa, i); const n = vnoise(q.x * 9 + sd, q.y * 9 + q.z * 7) - .5; q.multiplyScalar(1 + amp * n); pa.setXYZ(i, q.x * sx, q.y * sy, q.z * sz); }
+    g.computeVertexNormals(); return g;
+  };
+  // 肝臟（兩葉）
+  const liverM = wet(0x7c2f27, .28);
+  for (const sg of [1, -1]) { const g = blob(1, .17, .1, .08, .25, sg * 3); const mm = new THREE.Mesh(g, liverM); mm.position.set(.66, -.26, .07 * sg); mm.rotation.z = -.35; addMesh(p, mm, V(.32, -.05, .12 * sg)); }
+  // 膽囊
+  const gb = new THREE.Mesh(blob(.036, 1, 1.2, 1, .1, 5), wet(0x3d7a3c, .2)); gb.position.set(.58, -.36, .1); addMesh(p, gb, V(.32, -.12, .22));
+  // 胃
+  const stom = new THREE.Mesh(blob(1, .2, .11, .1, .15, 9), wet(0xd9a493, .38)); stom.position.set(.42, -.1, -.02); stom.rotation.z = .25; addMesh(p, stom, V(.1, .18, 0));
+  // 長長的腸子（台灣鯛吃藻類，腸子很長）
+  const pts = []; for (let i = 0; i <= 420; i++) {
+    const s = i / 420; pts.push(V(.02 + .36 * Math.sin(2 * Math.PI * 2 * s + .3) * (.85 + .15 * Math.sin(9 * s)), -.27 + .14 * Math.sin(2 * Math.PI * 3 * s + 1.1), .14 * Math.sin(2 * Math.PI * 5 * s + .6)));
+  }
+  const intest = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 900, .027, 10), wet(0xc47f6c, .35));
+  addMesh(p, intest, V(-.22, -.18, 0));
+  // 脂肪
+  const fatM = wet(0xf2e2b4, .45);
+  for (let i = 0; i < 7; i++) { const f = new THREE.Mesh(blob(.04 + .02 * rnd(), 1.4, 1, 1, .3, i), fatM); f.position.set(-.3 + .6 * rnd(), -.4 + .18 * rnd(), (rnd() - .5) * .22); addMesh(p, f, V(-.22, -.18, 0)); }
+  // 心臟
+  const heart = new THREE.Group();
+  const ven = new THREE.Mesh(blob(.06, 1, .9, 1, .1, 2), wet(0x8b1d22, .25)); heart.add(ven);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.032, 16, 12), wet(0xd8c8c0, .3)); bulb.position.set(.065, .02, 0); heart.add(bulb);
+  heart.position.set(.92, -.4, 0);
+  heart.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.part = 'viscera'; pickables.push(o); p.mats.includes(o.material) || p.mats.push(o.material); } });
+  const hh = new THREE.Group(); hh.add(heart); p.inner.add(hh); p.items.push({ obj: hh, home: V(), off: V(.6, .05, 0), rot: V() });
+}
+// ---------- 魚鰓 ----------
+{
+  const p = makePart('gills', V(1.65, -1.35, .5), V(1.05, 0, 0));
+  const gillTex = makeGillTex();
+  const filM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: gillTex, alphaTest: .35, side: THREE.DoubleSide, roughness: .4, clearcoat: .6 });
+  const archM = new THREE.MeshStandardMaterial({ color: 0xf1d6d0, roughness: .5 });
+  for (const sg of [1, -1]) {
+    const grp = new THREE.Group(); p.inner.add(grp);
+    for (let i = 0; i < 4; i++) {
+      const t0 = .722 + i * .017, pts = [];
+      for (let k = 0; k <= 14; k++) {
+        const w = k / 14, t = t0 + .07 * w * w, pr = prof(t);
+        pts.push(V(X(t) - .07 * Math.sin(Math.PI * w), lerp(pr.yc + .3 * pr.hh, pr.yc - .72 * pr.hh, w), sg * pr.hw * (.62 - .09 * i) * (.75 + .25 * Math.sin(Math.PI * w))));
+      }
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const arch = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, .011, 6), archM); arch.castShadow = true; arch.userData.part = 'gills'; grp.add(arch); pickables.push(arch);
+      // 鰓絲（緞帶＋透明貼圖）
+      const pos = [], uv = [], idx = [], M = 40;
+      for (let k = 0; k <= M; k++) {
+        const w = k / M, q = curve.getPoint(w), L = .085 * (.45 + .55 * Math.sin(Math.PI * w)), d = V(-1, 0, .5 * sg).normalize();
+        pos.push(q.x, q.y, q.z, q.x + d.x * L, q.y + d.y * L, q.z + d.z * L); uv.push(w, 0, w, 1);
+        if (k < M) { const a = k * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+      }
+      const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); fg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); fg.setIndex(idx); fg.computeVertexNormals();
+      const fil = new THREE.Mesh(fg, filM); fil.castShadow = true; fil.userData.part = 'gills'; grp.add(fil); pickables.push(fil);
+    }
+    const holder = new THREE.Group(); p.inner.remove(grp); holder.add(grp); p.inner.add(holder);
+    p.items.push({ obj: holder, home: V(), off: V(0, 0, .45 * sg), rot: V(0, -.5 * sg, 0) });
+  }
+  p.mats.push(filM, archM);
+}
+// ---------- 魚鰭與魚尾 ----------
+{
+  const p = makePart('fins', V(0, 0, 0), V(-.4, .1, 0));
+  const finGeo = (nRays, base, tip, { pleat = .011, nv = 12, curl = 0 } = {}) => {
+    const nu = (nRays - 1) * 2;
+    return gridGeo(nu, nv, (u, v, o) => {
+      const b = base(u), t = tip(u); o.copy(b).lerp(t, v);
+      const i = Math.round(u * nu); o.z += (i % 2 === 0 ? 1 : -1) * pleat * Math.pow(v, .8) + curl * v * v;
+    }, { uvFn: (u, v) => [u, v] });
+  };
+  const mat = (o) => new THREE.MeshStandardMaterial({ map: makeFinTex(o), transparent: true, alphaTest: .04, side: THREE.DoubleSide, roughness: .45, metalness: .05, depthWrite: true });
+  // 背鰭：前段硬棘 17 根，後段軟條 11 根
+  const dH = [[0, .14], [.08, .24], [.3, .27], [.58, .26], [.63, .31], [.8, .47], [.92, .44], [1, .24]];
+  const dA = [[0, .35], [.6, .5], [.85, .95], [1, 1.3]];
+  const dT = u => lerp(.712, .25, u);
+  const dorsal = new THREE.Mesh(finGeo(28, u => { const t = dT(u); return V(X(t), TOP(t) - .03, 0); },
+    u => { const t = dT(u), a = lin(dA, u), h = lin(dH, u); return V(X(t) - Math.sin(a) * h, TOP(t) - .03 + Math.cos(a) * h, 0); }),
+    mat({ rays: 28, notchUntil: .6, spots: 26, base: [.24, .26, .27], tip: [.3, .31, .32], margin: [.5, .2, .18] }));
+  addMesh(p, dorsal, V(0, .95, .25));
+  p.anchorItem = p.items[p.items.length - 1];
+  // 臀鰭：硬棘 3 根＋軟條 9 根
+  const aH = [[0, .11], [.18, .2], [.25, .24], [.6, .38], [.85, .34], [1, .17]], aA = [[0, .5], [.5, .8], [1, 1.2]], aT = u => lerp(.415, .235, u);
+  const anal = new THREE.Mesh(finGeo(12, u => { const t = aT(u); return V(X(t), BOT(t) + .03, 0); },
+    u => { const t = aT(u), a = lin(aA, u), h = lin(aH, u); return V(X(t) - Math.sin(a) * h, BOT(t) + .03 - Math.cos(a) * h, 0); }),
+    mat({ rays: 12, notchUntil: .2, spots: 16, base: [.3, .32, .33], margin: [.6, .25, .2] }));
+  addMesh(p, anal, V(0, -.85, .3));
+  // 尾鰭：截形、帶直條紋
+  const yc0 = prof(.01).yc;
+  const caudal = new THREE.Mesh(finGeo(18, u => V(-1.955 + .03 * Math.sin(Math.PI * u), yc0 + .165 * (1 - 2 * u), 0),
+    u => V(-2.56 - .07 * Math.sin(Math.PI * u), yc0 + .45 * (1 - 2 * u) * (1 - .06 * Math.pow(Math.abs(1 - 2 * u), 6)), 0), { pleat: .012 }),
+    mat({ rays: 18, stripes: 7, base: [.33, .36, .36], tip: [.4, .4, .4], a1: .7, margin: [.58, .25, .22] }));
+  addMesh(p, caudal, V(-.95, 0, 0));
+  // 胸鰭（一對）
+  const pL = [[0, .34], [.25, .52], [.5, .5], [1, .27]];
+  const pect = finGeo(13, u => V(0, .06 - .12 * u, 0), u => { const a = lerp(.38, -.45, u), L = lin(pL, u); return V(-Math.cos(a) * L, .06 - .12 * u + Math.sin(a) * L, 0); }, { pleat: .006, curl: .03 });
+  const pectM = mat({ rays: 13, base: [.42, .4, .37], tip: [.5, .47, .43], a0: .42, a1: .22, margin: [.55, .45, .4] });
+  for (const sg of [1, -1]) {
+    const th = Math.asin(-.22), root = bodyPt(.704, sg > 0 ? th : Math.PI - th, .97);
+    const g = pect.clone(); if (sg < 0) g.scale(1, 1, -1);
+    g.applyMatrix4(new THREE.Matrix4().makeRotationY(.42 * sg)); g.translate(root.x, root.y, root.z);
+    addMesh(p, new THREE.Mesh(g, pectM), V(.15, .1, 1.05 * sg));
+  }
+  // 腹鰭（一對）
+  const vL = [[0, .3], [.3, .38], [1, .2]];
+  const pelv = finGeo(6, u => V(.02 * u, .03 - .06 * u, 0), u => { const a = lerp(-.75, -1.05, u), L = lin(vL, u); return V(-Math.cos(a) * L, .03 - .06 * u + Math.sin(a) * L, 0); }, { pleat: .006 });
+  const pelvM = mat({ rays: 6, base: [.3, .32, .33], tip: [.25, .26, .27], a0: .9, a1: .7, margin: [.15, .15, .16] });
+  for (const sg of [1, -1]) {
+    const g = pelv.clone(); if (sg < 0) g.scale(1, 1, -1);
+    g.applyMatrix4(new THREE.Matrix4().makeRotationX(-.35 * sg)); g.applyMatrix4(new THREE.Matrix4().makeRotationY(.2 * sg));
+    g.translate(X(.69), BOT(.69) + .07, .09 * sg);
+    addMesh(p, new THREE.Mesh(g, pelvM), V(0, -.7, .75 * sg));
+  }
+}
+// ---------- 魚鱗（約一千多片，一片片獨立） ----------
+{
+  const scaleGeo = new THREE.CircleGeometry(1, 20); const pa = scaleGeo.attributes.position;
+  for (let i = 0; i < pa.count; i++) { const x = pa.getX(i), y = pa.getY(i); pa.setZ(i, -.07 * (x * x + y * y)); }
+  scaleGeo.computeVertexNormals();
+  const data = [], dt = .0185;
+  for (let c = 0; ; c++) {
+    const t = .025 + c * dt; if (t > .745) break;
+    const pr = prof(t), a = pr.hh, b = pr.hw, circ = 2 * Math.PI * Math.sqrt((a * a + b * b) / 2);
+    const rows = Math.max(10, Math.round(circ / .074));
+    for (let r = 0; r < rows; r++) {
+      const v = (r + (c & 1) * .5) / rows, th = TH(v);
+      if (t > tCut(th) - .012) continue;
+      const pos = bodyPt(t, th, 1), T = bodyPt(t + .001, th, 1).sub(pos).normalize(), Bt = bodyPt(t, th + .001, 1).sub(pos).normalize();
+      const n = V().crossVectors(T, Bt).normalize();
+      const sp = Math.min(dt * 4, circ / rows), rad = sp * .95;
+      data.push({ t, th, pos, T, n, rad });
+    }
+  }
+  const mat = new THREE.MeshPhysicalMaterial({ map: makeScaleTex(), roughness: .36, metalness: .5, iridescence: .32, iridescenceIOR: 1.3, iridescenceThicknessRange: [250, 450], clearcoat: .3, clearcoatRoughness: .3, side: THREE.DoubleSide });
+  const mesh = new THREE.InstancedMesh(scaleGeo, mat, data.length);
+  mesh.frustumCulled = false;
+  const cen = V(); data.forEach(d => cen.add(d.pos)); cen.divideScalar(data.length);
+  const p = makePart('scales', V(0, 3.15, -.1), cen);
+  const m4 = new THREE.Matrix4(), col = new THREE.Color();
+  data.forEach((d, i) => {
+    const np = d.n.clone().addScaledVector(d.T, .16).normalize();
+    const xp = d.T.clone().addScaledVector(np, -d.T.dot(np)).normalize(), yp = V().crossVectors(np, xp);
+    m4.makeBasis(xp, yp, np);
+    d.q = new THREE.Quaternion().setFromRotationMatrix(m4);
+    d.p = d.pos.clone().addScaledVector(d.n, .006).addScaledVector(d.T, -d.rad * .22);
+    d.s = V(d.rad, d.rad * .92, d.rad);
+    d.rq = new THREE.Quaternion().setFromEuler(new THREE.Euler((rnd() - .5) * .7, (rnd() - .5) * .7, (rnd() - .5) * 1.2));
+    d.rd = d.n.clone().multiplyScalar(.06 + .22 * rnd()).add(V((rnd() - .5) * .16, (rnd() - .5) * .16, (rnd() - .5) * .16));
+    const st = Math.sin(d.th), bc = bodyColor(d.t, st), j = .9 + .2 * rnd();
+    col.setRGB(clamp(bc[0] * 1.08 * j), clamp(bc[1] * 1.08 * j), clamp(bc[2] * 1.08 * j), THREE.SRGBColorSpace);
+    mesh.setColorAt(i, col);
+  });
+  const q0 = new THREE.Quaternion(), qa = new THREE.Quaternion(), pv = V(), I = new THREE.Quaternion();
+  p.onInner = k => {
+    const e = ease(k);
+    data.forEach((d, i) => {
+      qa.copy(I).slerp(d.rq, e); q0.copy(d.q).multiply(qa);
+      pv.copy(d.p).addScaledVector(d.rd, e);
+      mesh.setMatrixAt(i, m4.compose(pv, q0, d.s));
+    });
+    mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere();
+  };
+  p.onInner(0);
+  mesh.instanceColor.needsUpdate = true;
+  addMesh(p, mesh);
+  p.scaleMesh = mesh; p.scaleCount = data.length;
+}
+
+/* ================= 拆解後的擺放位置（橫向螢幕／直向螢幕） ================= */
+const LAYOUT = {
+  land: { scales: [-2.55, 2.45, 0], skin: [2.75, 2.45, -.2], head: [2.05, .1, .2], gills: [1.95, -1.2, .6], bladder: [-.35, -.95, 1.0], viscera: [.3, -1.6, .6],
+    filletR: [-2.75, -2.5, .7], filletL: [3.35, -2.85, -.6] },
+  port: { scales: [0, 4.7, 0], skin: [0, 2.95, -.3], head: [1.75, .1, .2], gills: [1.2, -1.4, .55], bladder: [-.5, -.95, 1.0], viscera: [.35, -1.6, .6],
+    filletR: [0, -3.0, .7], filletL: [0, -4.5, -.6] },
+};
+function applyLayout() {
+  const port = innerWidth / innerHeight < 1, L = port ? LAYOUT.port : LAYOUT.land;
+  ground.position.y = port ? -5.8 : -4.2;
+  for (const k of ['scales', 'skin', 'head', 'gills', 'bladder', 'viscera']) parts[k].offset.set(...L[k]);
+  const f = parts.fillet.items; f[0].off.set(...L.filletR); f[1].off.set(...L.filletL);
+  LIST.forEach(k => { parts[k]._init = false; setInner(parts[k], parts[k].ie); });
+}
+applyLayout();
+
+/* ================= 標籤 ================= */
+const labelEls = {};
+for (const key of LIST) {
+  const p = parts[key], el = document.createElement('button');
+  el.className = 'lbl'; el.innerHTML = `<i class="dot" style="background:${INFO[key].color}"></i>${INFO[key].name}<em>${INFO[key].pct}%</em>`;
+  el.addEventListener('pointerdown', e => e.stopPropagation());
+  el.addEventListener('click', e => { e.stopPropagation(); select(key); });
+  const obj = new CSS2DObject(el);
+  const parent = p.anchorItem ? p.anchorItem.obj : p.inner;
+  const box = new THREE.Box3().setFromObject(p.anchorItem ? p.anchorItem.obj : p.inner);
+  if (key === 'scales') obj.position.set(p.center.x, p.center.y + .85, p.center.z);
+  else { const c = box.getCenter(V()); obj.position.set(c.x, box.max.y, c.z); if (p.anchorItem) obj.position.sub(p.anchorItem.obj.position); }
+  if (key === 'skeleton') obj.position.set(-.9, .85, 0);
+  if (key === 'fillet') obj.position.y += .0;
+  parent.add(obj); labelEls[key] = { el, obj };
+}
+
+/* ================= 狀態更新 ================= */
+let mode = 'explore', xray = false, isolate = null, selected = null, hover = null;
+const seen = new Set();
+const stagger = T => { const w = .34, d = (1 - w) / (ORDER.length - 1); const r = {}; ORDER.forEach((k, i) => r[k] = clamp((T - i * d) / w)); return r; };
+function setTargetsFromT(T) { const s = stagger(T); ORDER.forEach(k => parts[k].target = s[k]); }
+let tween = null; // 全域 T 動畫
+let globalT = 0;
+function animateT(to, dur = 2.6) { tween = { from: globalT, to, t: 0, dur: dur * Math.abs(to - globalT) + .01 }; }
+
+function applyPart(p, dt) {
+  const k = 1 - Math.exp(-dt * 9);
+  if (mode === 'explore') {
+    const sp = dt * 1.35; p.e += clamp(p.target - p.e, -sp, sp);
+    const e = ease(p.e);
+    p.dispTarget.copy(p.offset).multiplyScalar(e); p.dispTarget.y += Math.sin(Math.PI * p.e) * .25;
+    p.disp.lerp(p.dispTarget, p.dragFree ? 1 : .35 + .65 * k); p.sclTarget = 1; p.rotZTarget = 0;
+    setInner(p, p.e);
+  } else {
+    if (!p.dragging) p.disp.lerp(p.dispTarget, k);
+    const dist = p.disp.length();
+    p.sclTarget = p.placed ? 1 : lerp(1, .55, clamp(dist / 3.2));
+    const gi = GAME_INNER[p.key] || 0, tgtIe = p.placed ? 0 : gi * (p.dragging ? clamp(dist / 2.5) : 1);
+    setInner(p, p.ie + clamp(tgtIe - p.ie, -dt * 2, dt * 2));
+  }
+  p.scl += (p.sclTarget - p.scl) * k; p.rotZ += (p.rotZTarget - p.rotZ) * k;
+  p.root.position.copy(p.center).add(p.disp); p.root.scale.setScalar(p.scl); p.root.rotation.z = p.rotZ;
+}
+function setInner(p, ie) {
+  if (Math.abs(ie - p.ie) < 1e-5 && p._init) return; p._init = true; p.ie = ie;
+  const e = ease(ie);
+  p.items.forEach(it => { it.obj.position.copy(it.home).addScaledVector(it.off, e); it.obj.rotation.set(it.rot.x * e, it.rot.y * e, it.rot.z * e); });
+  if (p.onInner) p.onInner(ie);
+}
+function updateLabels() {
+  for (const key of LIST) {
+    const p = parts[key], { el, obj } = labelEls[key];
+    let show = p.visible && (mode === 'game' ? !p.placed : (key === 'skeleton' ? globalT > .9 || maxE() > .9 : p.e > .7));
+    if (selected === key && p.visible) show = true;
+    if (isolate && isolate !== key) show = false;
+    obj.visible = show; el.style.opacity = show ? 1 : 0;
+    el.classList.toggle('sel', selected === key);
+  }
+}
+const maxE = () => Math.max(...ORDER.map(k => parts[k].e));
+
+// 高亮與透視
+function refreshMaterials() {
+  for (const key of LIST) {
+    const p = parts[key], hl = selected === key ? .16 : hover === key ? .09 : 0;
+    const outer = xray && ['scales', 'skin', 'fillet', 'head', 'fins'].includes(key) && mode === 'explore';
+    p.mats.forEach(m => {
+      if (m.emissive) m.emissive.setRGB(hl * .9, hl * 1.2, hl * 1.4);
+      if (m.userData.baseTransparent === undefined) { m.userData.baseTransparent = m.transparent; m.userData.baseOpacity = m.opacity; m.userData.baseDepth = m.depthWrite; }
+      const op = outer ? (key === 'fillet' ? .3 : .16) : m.userData.baseOpacity;
+      m.transparent = outer || m.userData.baseTransparent; m.opacity = op; m.depthWrite = outer ? false : m.userData.baseDepth; m.needsUpdate = true;
+    });
+    p.root.visible = p.visible && (!isolate || isolate === key);
+  }
+}
+
+/* ================= 介面 ================= */
+const $ = id => document.getElementById(id);
+const plist = $('plist');
+LIST.forEach(key => {
+  const li = document.createElement('li'); li.dataset.key = key;
+  li.innerHTML = `<span class="seen"></span><i class="dot" style="background:${INFO[key].color}"></i><span class="nm">${INFO[key].name}</span><span class="pc">${INFO[key].pct}%</span><button class="eye" title="顯示／隱藏">👁</button>`;
+  li.addEventListener('click', () => select(key));
+  li.querySelector('.eye').addEventListener('click', e => { e.stopPropagation(); parts[key].visible = !parts[key].visible; li.classList.toggle('off', !parts[key].visible); refreshMaterials(); });
+  plist.appendChild(li);
+});
+const ybar = $('ybar');
+[...LIST.slice().sort((a, b) => INFO[b].pct - INFO[a].pct), null].forEach(key => {
+  const s = document.createElement('span');
+  s.style.width = (key ? INFO[key].pct : OTHER_PCT) + '%'; s.style.background = key ? INFO[key].color : '#dfe6e8';
+  s.title = key ? `${INFO[key].name} 約 ${INFO[key].pct}%` : `血水、黏液與碎屑等 約 ${OTHER_PCT}%`;
+  if (key) s.addEventListener('click', () => select(key));
+  ybar.appendChild(s);
+});
+const info = $('info');
+function renderInfo() {
+  if (!selected) {
+    info.innerHTML = `<div class="hello"><span class="tag">第3節 全魚利用寶藏圖</span><h2>一條魚，九個寶藏</h2>
+      <p>台灣鯛除了魚片，魚頭、魚骨、魚皮、魚鱗、內臟都能再利用。動手拆開來看看吧！</p>
+      <h3>怎麼玩</h3><ol><li>按下方「拆下 ▶」，由外而內一層層拆開魚。</li><li>點一下任何部位，看它的身體功能與全魚利用方法。</li>
+      <li>「透視」可以不拆開就看到裡面的內臟與骨頭。</li><li>到「組合挑戰」把部位拖回去，組合出完整的台灣鯛！</li></ol></div>`;
+    info.classList.remove('open'); return;
+  }
+  const d = INFO[selected], p = parts[selected];
+  const canMove = ORDER.includes(selected);
+  info.innerHTML = `<button class="close" aria-label="關閉">×</button><span class="tag">全魚利用</span>
+    <h2><i class="dot" style="background:${d.color};width:16px;height:16px"></i>${d.name}</h2>
+    <div class="pct">約占全魚重量 ${d.pct}%<div class="track"><i style="width:${Math.min(100, d.pct * 3)}%;background:${d.color}"></i></div></div>
+    <h3>它的工作</h3><p>${d.job}</p>
+    <h3>全魚利用：可以變成</h3><ul>${d.use.map(u => `<li>${u}</li>`).join('')}</ul>
+    <div class="lesson">📘 ${d.lesson}</div>
+    <div class="acts">${canMove && mode === 'explore' ? `<button class="btn sm pri" id="iMove">${p.target > .5 ? '裝回去' : '拆下來'}</button>` : ''}
+    <button class="btn sm" id="iIso">${isolate === selected ? '顯示全部' : '只看這個部位'}</button></div>`;
+  info.querySelector('.close').onclick = () => { select(null); };
+  const mv = $('iMove'); if (mv) mv.onclick = () => { p.target = p.target > .5 ? 0 : 1; tween = null; syncSlider(); renderInfo(); };
+  $('iIso').onclick = () => { isolate = isolate === selected ? null : selected; refreshMaterials(); renderInfo(); };
+  info.classList.add('open');
+}
+function select(key) {
+  selected = key; if (key) seen.add(key);
+  if (isolate && key && isolate !== key) isolate = null;
+  document.querySelectorAll('.plist li').forEach(li => { li.classList.toggle('sel', li.dataset.key === key); li.querySelector('.seen').textContent = seen.has(li.dataset.key) ? '✔' : ''; });
+  $('ptext').textContent = seen.size >= LIST.length ? `已認識 ${LIST.length} / ${LIST.length} 個部位——全魚利用小達人！` : `已認識 ${seen.size} / ${LIST.length} 個部位`;
+  $('pfill').style.width = (seen.size / LIST.length * 100) + '%';
+  if (innerWidth <= 860) $('parts').classList.remove('open');
+  refreshMaterials(); renderInfo();
+}
+const slider = $('slider');
+function syncSlider() { const avg = ORDER.reduce((s, k) => s + parts[k].target, 0) / ORDER.length; slider.value = Math.round(avg * 1000); globalT = avg; }
+slider.addEventListener('input', () => { stopSpin(); tween = null; globalT = slider.value / 1000; setTargetsFromT(globalT); });
+const stopSpin = () => { if (!userSpin) { controls.autoRotate = false; } };
+$('bExplode').onclick = () => { stopSpin(); animateT(1); };
+$('bAssemble').onclick = () => { stopSpin(); animateT(0); };
+$('bNext').onclick = () => { stopSpin(); const k = ORDER.find(k => parts[k].target < .5); if (k) { parts[k].target = 1; tween = null; syncSlider(); select(k); } };
+$('bPrev').onclick = () => { const k = [...ORDER].reverse().find(k => parts[k].target > .5); if (k) { parts[k].target = 0; tween = null; syncSlider(); } };
+$('bXray').onclick = () => { xray = !xray; $('bXray').classList.toggle('on', xray); refreshMaterials(); };
+$('bSpin').onclick = () => { controls.autoRotate = !controls.autoRotate; $('bSpin').classList.toggle('on', controls.autoRotate); };
+$('bReset').onclick = () => fitView(true);
+$('mParts').onclick = () => { $('parts').classList.toggle('open'); info.classList.remove('open'); };
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+/* ================= 視角 ================= */
+let camGoal = null;
+function fitView(animated = false) {
+  const asp = innerWidth / innerHeight, portrait = asp < 1;
+  let target, dir, radius;
+  if (mode === 'game') { target = V(0, portrait ? -.2 : .15, 0); dir = V(.05, .1, 1).normalize(); radius = portrait ? 7.3 : 6.6; }
+  else { const T = maxE(); target = portrait ? V(lerp(-.1, .2, T), lerp(.15, .1, T), 0) : V(lerp(-.1, .1, T), lerp(.15, .05, T), 0); dir = V(.3, .26, 1).normalize(); radius = lerp(portrait ? 2.2 : 3.1, portrait ? 6.6 : 5.2, T); }
+  const fov = camera.fov * Math.PI / 180, hFov = 2 * Math.atan(Math.tan(fov / 2) * asp);
+  const sideRoom = innerWidth > 860 && mode !== 'game' ? (innerWidth - 620) / innerWidth : 1;   // 預留左右面板空間
+  const d = Math.max(radius / Math.sin(fov / 2), radius / Math.sin(Math.max(.1, hFov * sideRoom) / 2)) * .82;
+  const pos = target.clone().addScaledVector(dir, d);
+  if (animated) camGoal = { pos, target, t: 0 }; else { camera.position.copy(pos); controls.target.copy(target); }
+}
+
+/* ================= 組合挑戰 ================= */
+let game = null;
+function setMode(m) {
+  if (mode === m && m !== 'game') return;
+  mode = m; tween = null;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  document.body.classList.toggle('game', m === 'game');
+  $('dock').hidden = m === 'game'; $('gamebar').hidden = m !== 'game'; $('hint').hidden = m === 'game';
+  isolate = null; xray = false; $('bXray').classList.remove('on');
+  LIST.forEach(k => { parts[k].visible = true; }); document.querySelectorAll('.plist li').forEach(li => li.classList.remove('off'));
+  if (m === 'game') startGame();
+  else {
+    game = null; ORDER.forEach(k => { const p = parts[k]; p.placed = true; p.e = p.ie; p.target = 0; p.dragging = false; });
+    globalT = 0; slider.value = 0;
+  }
+  controls.autoRotate = false; $('bSpin').classList.remove('on');
+  select(null); fitView(true);
+}
+function startGame() {
+  $('modal').classList.remove('show');
+  const portrait = innerWidth / innerHeight < 1;
+  let slots = portrait
+    ? [[-1.5, 4.7], [1.5, 4.7], [-1.5, 2.85], [1.5, 2.85], [-1.5, -2.6], [1.5, -2.6], [-1.5, -4.4], [1.5, -4.4]]
+    : [[-3.7, 2.2], [0, 2.35], [3.7, 2.2], [-5.4, -.1], [5.4, -.1], [-3.7, -2.45], [0, -2.6], [3.7, -2.45]];
+  slots = slots.sort(() => rnd() - .5);
+  ORDER.forEach((k, i) => {
+    const p = parts[k], [x, y] = slots[i];
+    p.placed = false; p.dragging = false;
+    p.dispTarget.set(x - p.center.x, y - p.center.y, .4 - p.center.z);
+    p.rotZTarget = (rnd() - .5) * .6;
+  });
+  game = { placed: 0, start: performance.now(), done: false };
+  $('gcnt').textContent = `0 / ${ORDER.length}`;
+  toast('拖曳部位，放回魚骨上對應的位置。建議由內而外：內臟 → 魚鰾 → 魚鰓 → 魚肉 → 魚頭 → 魚皮 → 魚鱗 → 魚鰭');
+}
+function placePart(p) {
+  p.placed = true; p.dispTarget.set(0, 0, 0); p.rotZTarget = 0; game.placed++;
+  $('gcnt').textContent = `${game.placed} / ${ORDER.length}`;
+  const d = INFO[p.key]; seen.add(p.key); select(p.key);
+  toast(`✔ ${d.name}歸位！${d.name}可以變成：${d.use[0]}`);
+  if (game.placed === ORDER.length) {
+    game.done = true; const s = Math.round((performance.now() - game.start) / 1000);
+    setTimeout(() => { $('mTime').textContent = `用時 ${fmt(s)}`; $('modal').classList.add('show'); controls.autoRotate = true; }, 1400);
+  }
+}
+const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+$('gHint').onclick = () => {
+  const k = GAME_HINT.find(k => !parts[k].placed); if (!k) return;
+  const where = { viscera: '魚骨下方的腹腔', bladder: '脊椎骨的正下方', gills: '頭部後方、肋骨前面', fillet: '包在魚骨左右兩側', head: '魚骨的最前端', skin: '包住整個魚身', scales: '蓋在魚皮外面', fins: '背、腹、胸和尾巴' }[k];
+  toast(`提示：把「${INFO[k].name}」拖到${where}`); flash = { key: k, t: 0 };
+};
+$('gRestart').onclick = () => { ORDER.forEach(k => { parts[k].placed = true; }); startGame(); };
+$('gExit').onclick = () => setMode('explore');
+$('mAgain').onclick = () => { $('modal').classList.remove('show'); controls.autoRotate = false; startGame(); };
+$('mBack').onclick = () => { $('modal').classList.remove('show'); setMode('explore'); };
+let flash = null;
+
+let toastTimer;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 4200); }
+
+/* ================= 滑鼠／觸控 ================= */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const vis = pickables.filter(m => { let o = m; while (o) { if (!o.visible) return false; o = o.parent; } return true; });
+  const hits = ray.intersectObjects(vis, false);
+  for (const h of hits) {
+    const k = h.object.userData.part;
+    if (xray && mode === 'explore' && ['scales', 'skin', 'fillet', 'head', 'fins'].includes(k) && hits.some(o => !['scales', 'skin', 'fillet', 'head', 'fins'].includes(o.object.userData.part))) continue;
+    return { key: k, point: h.point };
+  }
+  return null;
+}
+let down = null, drag = null;
+const dragPlane = new THREE.Plane(), tmpV = V();
+stage.addEventListener('pointerdown', ev => {
+  down = { x: ev.clientX, y: ev.clientY, t: performance.now() };
+  if (controls.autoRotate && mode === 'explore' && !userSpin) controls.autoRotate = false;
+  $('hint').style.opacity = 0;
+  if (mode === 'game' && !game?.done) {
+    const h = pick(ev);
+    if (h && ORDER.includes(h.key) && !parts[h.key].placed) {
+      const p = parts[h.key]; controls.enabled = false;
+      dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(V()).negate(), h.point);
+      drag = { p, grab: h.point.clone().sub(p.disp) }; p.dragging = true; p.rotZTarget = 0;
+      stage.setPointerCapture(ev.pointerId); select(h.key);
+    }
+  }
+}, true);
+stage.addEventListener('pointermove', ev => {
+  if (drag) {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    if (ray.ray.intersectPlane(dragPlane, tmpV)) drag.p.disp.copy(tmpV).sub(drag.grab);
+    return;
+  }
+  if (ev.pointerType === 'mouse') { pendingHover = ev; }
+});
+let pendingHover = null;
+function endDrag(ev) {
+  if (drag) {
+    const p = drag.p; p.dragging = false; drag = null; controls.enabled = true;
+    if (p.disp.length() < 1.15) placePart(p);
+    else { p.dispTarget.copy(p.disp); toast(`再靠近一點！把「${INFO[p.key].name}」拖到它在魚身上的位置`); }
+    return;
+  }
+  if (down && Math.hypot(ev.clientX - down.x, ev.clientY - down.y) < 6 && mode === 'explore') { const h = pick(ev); select(h ? h.key : null); }
+  down = null;
+}
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', () => { if (drag) { drag.p.dragging = false; drag.p.dispTarget.copy(drag.p.disp); drag = null; controls.enabled = true; } });
+let userSpin = false;
+$('bSpin').addEventListener('click', () => userSpin = controls.autoRotate);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+  applyLayout(); if (!controlsTouched) fitView(true);
+});
+
+/* ================= 主迴圈 ================= */
+const clock = new THREE.Clock();
+let lastFitT = -1;
+function loop() {
+  const dt = Math.min(clock.getDelta(), .05);
+  if (tween) { tween.t += dt; const k = clamp(tween.t / tween.dur); globalT = lerp(tween.from, tween.to, k); setTargetsFromT(globalT); slider.value = Math.round(globalT * 1000); if (k >= 1) tween = null; }
+  for (const key of LIST) applyPart(parts[key], dt);
+  ground.material.opacity = mode === 'game' ? .06 : lerp(.13, .05, maxE());
+  if (game && !game.done) $('gtime').textContent = fmt(Math.round((performance.now() - game.start) / 1000));
+  if (flash) {
+    flash.t += dt; const p = parts[flash.key], on = Math.floor(flash.t * 6) % 2 === 0 && flash.t < 1.8;
+    p.mats.forEach(m => m.emissive && m.emissive.setRGB(on ? .35 : 0, on ? .3 : 0, on ? .1 : 0)); if (flash.t >= 1.8) { flash = null; refreshMaterials(); }
+  }
+  if (pendingHover) {
+    const h = pick(pendingHover); pendingHover = null; const k = h ? h.key : null;
+    const can = k && (mode === 'explore' || (ORDER.includes(k) && !parts[k].placed));
+    renderer.domElement.style.cursor = can ? (mode === 'game' ? 'grab' : 'pointer') : '';
+    if (k !== hover) { hover = k; refreshMaterials(); }
+  }
+  // 拆解時自動拉遠鏡頭（使用者沒有手動操作時）
+  if (mode === 'explore' && !camGoal) {
+    const T = Math.round(maxE() * 20) / 20;
+    if (T !== lastFitT && !controlsTouched) { lastFitT = T; fitView(true); }
+  }
+  if (camGoal) {
+    camGoal.t += dt * 1.6; const k = 1 - Math.exp(-dt * 4);
+    camera.position.lerp(camGoal.pos, k); controls.target.lerp(camGoal.target, k);
+    if (camGoal.t > 2.5) camGoal = null;
+  }
+  controls.update();
+  updateLabels();
+  renderer.render(scene, camera); labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+let controlsTouched = false;
+controls.addEventListener('start', () => { controlsTouched = true; camGoal = null; });
+$('bReset').addEventListener('click', () => { controlsTouched = false; });
+$('bExplode').addEventListener('click', () => { controlsTouched = false; });
+$('bAssemble').addEventListener('click', () => { controlsTouched = false; });
+
+LIST.forEach(k => setInner(parts[k], 0));
+refreshMaterials(); renderInfo(); fitView(false);
+controls.autoRotate = true;
+loop();
+setTimeout(() => { $('loading').style.opacity = 0; setTimeout(() => $('loading').remove(), 700); }, 250);
+window.__fish = { parts, scene, camera, controls, THREE, renderer, setMode, select, fitView };
+</script>
+</body>
+</html>
