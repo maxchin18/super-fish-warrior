@@ -254,8 +254,9 @@ function profile(pts) {
     const a = arr[lo], b = arr[hi]; return lerp(a.y, b.y, (t - a.x) / ((b.x - a.x) || 1));
   };
 }
-const TOP = profile([[0, .392], [.027, .38], [.08, .416], [.148, .536], [.223, .675], [.313, .777], [.404, .898], [.494, .988], [.584, 1.012], [.675, .97], [.735, .892], [.773, .819], [.81, .735], [.848, .645], [.878, .566], [.901, .506], [.923, .446], [.946, .392], [.968, .349], [.988, .3], [1, .25]]);
-const BOT = profile([[0, -.217], [.027, -.217], [.08, -.241], [.148, -.38], [.223, -.53], [.268, -.64], [.313, -.73], [.358, -.795], [.404, -.825], [.494, -.85], [.584, -.855], [.675, -.759], [.735, -.639], [.773, -.566], [.81, -.482], [.848, -.38], [.878, -.298], [.901, -.235], [.923, -.157], [.946, -.066], [.968, -.006], [.988, .09], [1, .16]]);
+// 依照片量測的魚身上、下緣（847×481 照片座標換算；比照片邊緣外擴 1.5 像素，讓鰭根直接接在魚身邊上）
+const TOP = profile([[0, 0.4337], [0.012, 0.4066], [0.0271, 0.3855], [0.0422, 0.3759], [0.0572, 0.3735], [0.0723, 0.3795], [0.0873, 0.3946], [0.1024, 0.4458], [0.1175, 0.4805], [0.1325, 0.5106], [0.1476, 0.5426], [0.1627, 0.5713], [0.1777, 0.6015], [0.1928, 0.6311], [0.2078, 0.6581], [0.2229, 0.6815], [0.238, 0.7011], [0.253, 0.7183], [0.2681, 0.7343], [0.2831, 0.7499], [0.2982, 0.766], [0.3133, 0.7834], [0.3283, 0.8027], [0.3434, 0.8232], [0.3584, 0.8442], [0.3735, 0.865], [0.3886, 0.8849], [0.4036, 0.9032], [0.4187, 0.9208], [0.4337, 0.9384], [0.4488, 0.9553], [0.4639, 0.9705], [0.4789, 0.9834], [0.494, 0.9936], [0.509, 1.0016], [0.5241, 1.008], [0.5392, 1.013], [0.5542, 1.0165], [0.5693, 1.0183], [0.5843, 1.0179], [0.5994, 1.0153], [0.6145, 1.0107], [0.6295, 1.0043], [0.6446, 0.9965], [0.6596, 0.9871], [0.6747, 0.976], [0.6898, 0.9619], [0.7048, 0.9437], [0.7199, 0.94], [0.7289, 0.9247], [0.744, 0.9001], [0.759, 0.8726], [0.7741, 0.845], [0.7892, 0.8113], [0.8042, 0.7776], [0.8193, 0.7408], [0.8343, 0.7071], [0.8494, 0.6672], [0.8645, 0.6274], [0.8795, 0.5876], [0.8946, 0.5477], [0.9096, 0.5079], [0.9247, 0.468], [0.9398, 0.4343], [0.9548, 0.3976], [0.9699, 0.373], [0.9789, 0.3608], [0.9849, 0.3516], [0.991, 0.3363], [0.994, 0.3271], [0.997, 0.3087], [1, 0.275]]);
+const BOT = profile([[0, -0.2518], [0.012, -0.2395], [0.0271, -0.2303], [0.0422, -0.2334], [0.0572, -0.2518], [0.0723, -0.2702], [0.0873, -0.2916], [0.1024, -0.3343], [0.1175, -0.3705], [0.1325, -0.4096], [0.1476, -0.4518], [0.1627, -0.491], [0.1777, -0.5301], [0.1928, -0.5693], [0.2078, -0.6054], [0.2229, -0.6416], [0.238, -0.6807], [0.253, -0.7169], [0.2681, -0.75], [0.2831, -0.7801], [0.2982, -0.8126], [0.3133, -0.831], [0.3283, -0.8341], [0.3434, -0.8432], [0.3584, -0.8586], [0.3735, -0.8678], [0.3886, -0.8739], [0.4036, -0.88], [0.4187, -0.8862], [0.4337, -0.8923], [0.4488, -0.9015], [0.4639, -0.9199], [0.4789, -0.9291], [0.494, -0.9291], [0.509, -0.926], [0.5241, -0.9199], [0.5392, -0.9076], [0.5542, -0.8984], [0.5693, -0.8855], [0.5843, -0.8717], [0.5994, -0.856], [0.6145, -0.8392], [0.6295, -0.8205], [0.6446, -0.7994], [0.6596, -0.7771], [0.6747, -0.753], [0.6898, -0.7299], [0.7048, -0.7084], [0.7199, -0.687], [0.7289, -0.6747], [0.744, -0.6471], [0.759, -0.6195], [0.7741, -0.5889], [0.7892, -0.5582], [0.8042, -0.5215], [0.8193, -0.4847], [0.8343, -0.4449], [0.8494, -0.3989], [0.8645, -0.3529], [0.8795, -0.3162], [0.8946, -0.2732], [0.9096, -0.2303], [0.9247, -0.1752], [0.9398, -0.1078], [0.9548, -0.0679], [0.9699, -0.0281], [0.9789, 0.0117], [0.9849, 0.0424], [0.991, 0.0853], [0.994, 0.1067], [0.997, 0.1282], [1, 0.1497]]);
 const WID = profile([[0, .075], [.027, .091], [.08, .129], [.148, .177], [.223, .241], [.313, .3], [.404, .342], [.494, .364], [.584, .364], [.675, .342], [.735, .31], [.81, .262], [.878, .203], [.923, .145], [.946, .107], [.968, .07], [.988, .045], [1, .03]]);
 const X = t => -2 + 4 * t;
 const prof = t => { const yt = TOP(t), yb = BOT(t); return { yc: (yt + yb) / 2, hh: (yt - yb) / 2, hw: WID(t) }; };
@@ -529,7 +530,7 @@ const photoTex = new THREE.Texture(photoImg); photoTex.colorSpace = THREE.SRGBCo
 const finTex = (() => {
   const c = document.createElement('canvas'); c.width = photoImg.width; c.height = photoImg.height; const g = c.getContext('2d'); g.drawImage(photoImg, 0, 0);
   for (let X = 0; X < c.width; X++) { const px = X / c.width * PH.w; if (px < 14 || px > 676) continue; const t = (PH.x0 - px) / 664;
-    const r0 = (PH.y0 - TOP(t) / PH.k) / PH.h * c.height + 3, r1 = (PH.y0 - BOT(t) / PH.k) / PH.h * c.height + (px > 330 && px < 500 ? 22 : 6); if (r1 > r0) g.clearRect(X, r0, 1, r1 - r0); }
+    const r0 = (PH.y0 - TOP(t) / PH.k) / PH.h * c.height + 3, r1 = (PH.y0 - BOT(t) / PH.k) / PH.h * c.height - 6; if (r1 > r0) g.clearRect(X, r0, 1, r1 - r0); }   // 只挖魚身內部，不動鰭根
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 })();
 const photoPix = (() => { const c = document.createElement('canvas'); c.width = photoImg.width; c.height = photoImg.height; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(photoImg, 0, 0); return { d: g.getImageData(0, 0, c.width, c.height).data, w: c.width, h: c.height }; })();
@@ -609,7 +610,7 @@ function photoMat({ fin = false, ...o } = {}) {
   // 眼睛
   const eyeMat = new THREE.MeshPhysicalMaterial({ map: makeEyeTex(), roughness: .08, clearcoat: 1, clearcoatRoughness: .02, metalness: 0 });
   for (const sg of [1, -1]) {
-    const t = .898, pr = prof(t), st = .51, th = Math.asin(st);   // 照片上的眼睛位置
+    const t = (PH.x0 - 81.4) / 664, pr = prof(t), st = clamp(((PH.y0 - 185.7) * PH.k - pr.yc) / pr.hh, -1, 1), th = Math.asin(st);   // 照片上的眼睛位置
     const c = bodyPt(t, sg > 0 ? th : Math.PI - th, 1);
     const nrm = V(.25, .2, sg).normalize();
     const eye = new THREE.Mesh(new THREE.SphereGeometry(.118, 40, 24), eyeMat);
@@ -795,14 +796,14 @@ function photoMat({ fin = false, ...o } = {}) {
   const pUp = [[200, 247], [225, 254], [270, 274], [330, 306], [392, 341], [432, 354]], pLo = [[202, 269], [225, 294], [261, 320], [315, 340], [382, 356], [432, 354]];
   const pectM = finMat(3, true), rootX = fromPhoto(201, 258).x;
   for (const sg of [1, -1]) {
-    const g = finSheet(8, 24, (u, v, o) => { o.copy(polyAt(pUp, v)).lerp(polyAt(pLo, v), u); const d = Math.max(0, rootX - o.x); o.z = sg * (surfZ(o.x, o.y) + .022 + .03 * d); });
+    const g = finSheet(8, 24, (u, v, o) => { o.copy(polyAt(pUp, v * .97)).lerp(polyAt(pLo, v * .97), u); const d = Math.max(0, rootX - o.x); o.z = sg * (surfZ(o.x, o.y) + .022 + .03 * d); });
     g.computeVertexNormals();
     addMesh(p, new THREE.Mesh(g, pectM), V(.15, .1, 1.05 * sg));
   }
   // 腹鰭（一對）
   const pelvM = finMat(4);
   for (const sg of [1, -1]) {
-    const g = finSheet(12, 14, (u, v, o) => { const t = lerp(.73, .64, u); o.set(X(t), BOT(t) + .05, 0).lerp(V(X(t) - .85, BOT(t) - .95, 0), v); o.z = sg * (.1 + .12 * v); });
+    const g = finSheet(12, 14, (u, v, o) => { const t = lerp(.73, .64, u); o.set(X(t), BOT(t) - .008, 0).lerp(V(X(t) - .85, BOT(t) - .95, 0), v); o.z = sg * (.1 + .12 * v); });   // 腹鰭從魚身下緣開始，不帶到腹部像素
     addMesh(p, new THREE.Mesh(g, pelvM), V(0, -.7, .75 * sg));
   }
 }
@@ -855,8 +856,12 @@ function photoMat({ fin = false, ...o } = {}) {
     mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere();
     mesh.visible = k > .004; shell.visible = !mesh.visible;
   };
-  const shellGeo = gridGeo(110, 96, (u, v, o) => { const th = TH(v); bodyPt(lerp(.004, tCut(th) - .002, u), th, 1.0, o); }, { seam: true });
-  const shell = new THREE.Mesh(setPhotoUV(shellGeo), photoMat());
+  // 魚身照片外殼；尾端越過尾柄後逐漸變薄，自然收進尾鰭（不留開口）
+  const shellGeo = gridGeo(116, 96, (u, v, o) => { const th = TH(v), t = lerp(-.04, tCut(th) - .002, u); bodyPt(t, th, 1.0, o); if (t < 0) { o.z *= Math.pow(clamp(1 + t / .04), .6); const yc0 = prof(0).yc; o.y = yc0 + (o.y - yc0) * (1 + 2.5 * t); } }, { seam: true });
+  { const pa = shellGeo.attributes.position, nr = shellGeo.attributes.normal, n = V();   // 收進尾鰭的那段，打光朝向漸漸和尾鰭一致
+    for (let i = 0; i < pa.count; i++) { const k = sstep(-1.985, -2.15, pa.getX(i)); if (k <= 0) continue;
+      n.fromBufferAttribute(nr, i); n.lerp(V(0, 0, Math.sign(pa.getZ(i)) || Math.sign(n.z) || 1), k).normalize(); nr.setXYZ(i, n.x, n.y, n.z); } }
+  const shellMat = photoMat(), shell = new THREE.Mesh(setPhotoUV(shellGeo), shellMat);
   addMesh(p, shell);
   p.onInner(0);
   mesh.instanceColor.needsUpdate = true;
@@ -1261,7 +1266,7 @@ refreshMaterials(); renderInfo(); fitView(false);
 controls.autoRotate = true;
 loop();
 setTimeout(() => { $('loading').style.opacity = 0; setTimeout(() => $('loading').remove(), 700); }, 250);
-window.__fish = { SWIM, parts, scene, camera, controls, THREE, renderer, setMode, select, fitView };
+window.__fish = { TOP, BOT, WID, SWIM, parts, scene, camera, controls, THREE, renderer, setMode, select, fitView };
 </script>
 </body>
 </html>
