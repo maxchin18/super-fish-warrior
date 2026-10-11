@@ -738,14 +738,14 @@ const tex = makeBodyTextures(), muscleTex = makeMuscleTex();
   const dorsal = new THREE.Mesh(finGeo(28, u => { const t = dT(u); return V(X(t), TOP(t) - .03, 0); },
     u => { const t = dT(u), a = lin(dA, u), h = lin(dH, u); return V(X(t) - Math.sin(a) * h, TOP(t) - .03 + Math.cos(a) * h, 0); }),
     mat({ rays: 28, notchUntil: .7, spots: 26, base: [.17, .19, .21], tip: [.24, .25, .28], a0: .97, a1: .85, margin: [.55, .3, .28] }));
-  addMesh(p, dorsal, V(0, .95, .25));
+  addMesh(p, dorsal, V(0, .95, .25)); dorsal.material.userData.fin = 1;
   p.anchorItem = p.items[p.items.length - 1];
   // 臀鰭：硬棘 3 根＋軟條 9 根
   const aH = [[0, .14], [.2, .26], [.3, .32], [.65, .55], [.85, .5], [1, .25]], aA = [[0, .55], [.5, .9], [1, 1.25]], aT = u => lerp(.33, .12, u);
   const anal = new THREE.Mesh(finGeo(12, u => { const t = aT(u); return V(X(t), BOT(t) + .03, 0); },
     u => { const t = aT(u), a = lin(aA, u), h = lin(aH, u); return V(X(t) - Math.sin(a) * h, BOT(t) + .03 - Math.cos(a) * h, 0); }),
     mat({ rays: 12, notchUntil: .2, spots: 16, base: [.16, .18, .22], tip: [.26, .24, .28], a0: .97, a1: .88, margin: [.5, .28, .28] }));
-  addMesh(p, anal, V(0, -.85, .3));
+  addMesh(p, anal, V(0, -.85, .3)); anal.material.userData.fin = 1;
   // 尾鰭：扇形展開，鰭條由尾柄放射、略帶弧度，外緣圓潤
   const yc0 = prof(.01).yc, cRays = 22;
   const caudalGeo = gridGeo((cRays - 1) * 2, 16, (u, v, o) => {
@@ -757,7 +757,7 @@ const tex = makeBodyTextures(), muscleTex = makeMuscleTex();
   }, { uvFn: (u, v) => [u, v] });
   const caudal = new THREE.Mesh(caudalGeo,
     mat({ rays: cRays, stripes: 7, spots: 34, base: [.2, .21, .23], tip: [.42, .28, .28], a0: .97, a1: .72, margin: [.68, .3, .28] }));
-  addMesh(p, caudal, V(-.95, 0, 0));
+  addMesh(p, caudal, V(-.95, 0, 0)); caudal.material.userData.fin = 2;
   // 胸鰭（一對）
   const pL = [[0, .72], [.15, 1.02], [.35, .9], [.7, .6], [1, .4]];
   const pect = finGeo(15, u => V(0, .07 - .14 * u, 0), u => { const a = lerp(.14, -.22, u), L = lin(pL, u); return V(-Math.cos(a) * L, .07 - .14 * u + Math.sin(a) * L, 0); }, { pleat: .007, curl: .05 });
@@ -770,12 +770,12 @@ const tex = makeBodyTextures(), muscleTex = makeMuscleTex();
       for (let i = 0; i < pa.count; i++) { const x = pa.getX(i), y = pa.getY(i), d = Math.max(0, root.x - x);
         const zs = surfZ(x, y) + .02 + .03 * d; if (Math.abs(pa.getZ(i)) < zs) pa.setZ(i, zs * sg); }
       g.computeVertexNormals(); }
-    addMesh(p, new THREE.Mesh(g, pectM), V(.15, .1, 1.05 * sg)); pectM.userData.flap = true;
+    addMesh(p, new THREE.Mesh(g, pectM), V(.15, .1, 1.05 * sg)); pectM.userData.fin = 3;
   }
   // 腹鰭（一對）
   const vL = [[0, .78], [.2, .95], [1, .42]];
   const pelv = finGeo(6, u => V(.03 * u, .04 - .08 * u, 0), u => { const a = lerp(-.45, -.78, u), L = lin(vL, u); return V(-Math.cos(a) * L, .04 - .08 * u + Math.sin(a) * L, 0); }, { pleat: .007 });
-  const pelvM = mat({ rays: 6, base: [.2, .2, .23], tip: [.32, .27, .3], a0: .97, a1: .9, margin: [.3, .22, .24] });
+  const pelvM = mat({ rays: 6, base: [.2, .2, .23], tip: [.32, .27, .3], a0: .97, a1: .9, margin: [.3, .22, .24] }); pelvM.userData.fin = 4;
   for (const sg of [1, -1]) {
     const g = pelv.clone(); if (sg < 0) g.scale(1, 1, -1);
     g.applyMatrix4(new THREE.Matrix4().makeRotationX(-.25 * sg)); g.applyMatrix4(new THREE.Matrix4().makeRotationY(.16 * sg));
@@ -852,31 +852,46 @@ function applyLayout() {
   LIST.forEach(k => { parts[k]._init = false; setInner(parts[k], parts[k].ie); });
 }
 applyLayout();
-for (const k of LIST) parts[k].mats.forEach(m => addSwim(m, !!m.userData.flap));
+for (const k of LIST) parts[k].mats.forEach(m => addSwim(m, m.userData.fin || 0));
 
 /* ================= 微游動（只在組合完整時） ================= */
-const SWIM = { uSwimTime: { value: 0 }, uSwimAmp: { value: 0 } };
+const SWIM = { uSwimTime: { value: 0 }, uSwimAmp: { value: 0 }, uSwimPhase: { value: 0 }, uSwimBeat: { value: 0 } };
 let swimOn = true;
-function addSwim(m, flap) {
+// fin：0＝身體　1＝背鰭／臀鰭（沿鰭波動）　2＝尾鰭（慢半拍彎折）　3＝胸鰭（划水）　4＝腹鰭（輕擺）
+function addSwim(m, fin) {
   if (m.userData.swim) return; m.userData.swim = true;
   m.onBeforeCompile = sh => {
-    sh.uniforms.uSwimTime = SWIM.uSwimTime; sh.uniforms.uSwimAmp = SWIM.uSwimAmp;
-    sh.vertexShader = 'uniform float uSwimTime;\nuniform float uSwimAmp;\n' + sh.vertexShader.replace('#include <project_vertex>', `
+    Object.assign(sh.uniforms, SWIM);
+    sh.vertexShader = 'uniform float uSwimTime;\nuniform float uSwimAmp;\nuniform float uSwimPhase;\nuniform float uSwimBeat;\n#define FIN ' + fin + '\n' +
+      sh.vertexShader.replace('#include <project_vertex>', `
       vec4 mvPosition = vec4( transformed, 1.0 );
       #ifdef USE_INSTANCING
         mvPosition = instanceMatrix * mvPosition;
       #endif
       vec4 wp = modelMatrix * mvPosition;
-      float sx = clamp( ( 2.1 - wp.x ) / 5.0, 0.0, 1.0 );          // 0＝吻端，1＝尾鰭末端
-      float ph = uSwimTime * 3.4 - wp.x * 1.25;
-      wp.z += uSwimAmp * ( 0.12 + 1.6 * sx * sx ) * sin( ph );
-      wp.x -= uSwimAmp * 0.25 * sx * sx * sx * abs( sin( ph ) );
-      wp.y += uSwimAmp * 0.5 * sin( uSwimTime * 1.1 );
-      ${flap ? 'wp.z += sign( wp.z ) * uSwimAmp * 1.4 * clamp( 0.85 - wp.x, 0.0, 1.2 ) * ( 0.5 + 0.5 * sin( uSwimTime * 4.2 ) );' : ''}
+      float T = uSwimTime, A = uSwimAmp;
+      float sx = clamp( ( 2.1 - wp.x ) / 5.0, 0.0, 1.0 );                 // 0＝吻端，1＝尾鰭末端
+      float ph = uSwimPhase - wp.x * 1.15;                                  // 由頭往尾傳遞的波
+      float env = 0.04 + 1.25 * sx * sx * ( 0.75 + 0.35 * uSwimBeat );     // 越靠尾巴擺幅越大
+      wp.z += A * env * sin( ph ) - A * 0.18 * ( 1.0 - sx ) * sin( uSwimPhase + 0.6 );   // 頭部輕微反向
+      wp.x -= A * 0.2 * sx * sx * sx * abs( sin( ph ) );
+      wp.y += A * ( 0.45 * sin( T * 0.73 ) + 0.12 * wp.x * sin( T * 0.41 + 1.0 ) );     // 緩慢浮沉、微俯仰
+      #if FIN == 1
+        wp.z += A * 0.75 * uv.y * sin( T * 3.1 - wp.x * 4.2 );
+      #elif FIN == 2
+        wp.z += A * 1.15 * pow( uv.y, 1.6 ) * sin( ph - 1.4 );
+        wp.y += A * 0.25 * uv.y * ( uv.x - 0.5 ) * sin( ph - 0.9 );
+      #elif FIN == 3
+        float sd = sign( wp.z ), stroke = sin( T * 2.7 + sd * 0.5 - uv.x * 1.3 );
+        wp.z += sd * A * 1.35 * uv.y * ( 0.45 + 0.55 * stroke );
+        wp.y += A * 0.55 * uv.y * cos( T * 2.7 + sd * 0.5 - uv.x * 1.3 );
+      #elif FIN == 4
+        wp.z += sign( wp.z ) * A * 0.55 * uv.y * ( 0.5 + 0.5 * sin( T * 1.9 + 0.8 ) );
+      #endif
       mvPosition = viewMatrix * wp;
       gl_Position = projectionMatrix * mvPosition;`);
   };
-  m.customProgramCacheKey = () => flap ? 'swim-flap' : 'swim';
+  m.customProgramCacheKey = () => 'swim' + fin;
   m.needsUpdate = true;
 }
 
@@ -1168,7 +1183,9 @@ function loop() {
   if (tween) { tween.t += dt; const k = clamp(tween.t / tween.dur); globalT = lerp(tween.from, tween.to, k); setTargetsFromT(globalT); slider.value = Math.round(globalT * 1000); if (k >= 1) tween = null; }
   for (const key of LIST) applyPart(parts[key], dt);
   { const still = mode === 'explore' ? 1 - clamp(maxE() * 5) : (game && game.done ? 1 : 0);
-    const target = swimOn ? .08 * still : 0; SWIM.uSwimAmp.value += (target - SWIM.uSwimAmp.value) * Math.min(1, dt * 3); SWIM.uSwimTime.value += dt; }
+    const target = swimOn ? .075 * still : 0; SWIM.uSwimAmp.value += (target - SWIM.uSwimAmp.value) * Math.min(1, dt * 2);
+    const T = SWIM.uSwimTime.value += dt, beat = .5 + .5 * Math.sin(T * .23) * Math.sin(T * .61 + 1.3);
+    SWIM.uSwimBeat.value = beat; SWIM.uSwimPhase.value += dt * (2.0 + 1.3 * beat); }
   ground.material.opacity = mode === 'game' ? .06 : lerp(.13, .05, maxE());
   if (game && !game.done) $('gtime').textContent = fmt(Math.round((performance.now() - game.start) / 1000));
   if (flash) {
